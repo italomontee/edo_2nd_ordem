@@ -1,0 +1,29 @@
+import numpy as np
+from scipy.integrate import solve_ivp
+
+# Definir a função que representa o sistema de EDOs
+def system_of_odes(x, y_z):
+    y, z = y_z
+    dydx = z
+    dzdx = np.exp(-x) - 2*z - 2*y
+    return [dydx, dzdx]
+
+# Definir as condições iniciais
+x0 = 0
+y0 = 1
+z0 = 0
+initial_conditions = [y0, z0]
+
+# Definir o intervalo de integração
+x_span = (0, 5)  # Do ponto inicial x=0 até x=5
+
+# Resolver o sistema usando o método de Runge-Kutta de 4ª ordem
+solution = solve_ivp(system_of_odes, x_span, initial_conditions, method='RK45')
+
+# Obter os resultados
+x_values = solution.t
+y_values, z_values = solution.y
+
+# Imprimir os resultados
+for i in range(len(x_values)):
+    print(f"x = {x_values[i]:.2f}, y = {y_values[i]:.6f}, z = {z_values[i]:.6f}")
