@@ -14,6 +14,8 @@ def convert_to_first_order():
 
     solve_runge_kutta(equation_str)
     
+
+
 def solve_runge_kutta(equation_str):
     # Obter os valores informados pelo usuário
     x0 = float(x0_entry.get())

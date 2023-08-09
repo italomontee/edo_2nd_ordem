@@ -1,21 +1,6 @@
-import sympy as sp
-def convert_to_first_order(equation_str):
+result_str = ""  # Inicializa a variável vazia
 
-    x = sp.Symbol('x')
-    y = sp.Function('y')(x)
+for i in range(1, 6):  # Exemplo de loop de 1 a 5
+    result_str += f"Valor {i}: {i * 2}\n"  # Concatena o novo valor ao resultado
 
-    # Convertendo a string da equação para a forma simbólica
-    equation_str = equation_str.replace("y''", "y.diff(x).diff(x)")
-    equation_str = equation_str.replace("y'", "y")
-    eq1 = eval(equation_str)
-
-    
-
-    return equation_str
-
-# Solicitar a função do usuário
-equation_str = input("Insira a EDO de segunda ordem (use 'y' como variável dependente e 'x' como variável independente): ")
-
-# Executando a conversão e imprimindo o resultado
-result_equation = convert_to_first_order(equation_str)
-print("A EDO de primeira ordem equivalente é:", result_equation)
+print(result_str)  # Imprime o resultado final
