@@ -143,7 +143,7 @@ def iniciarl():
     text = ""
     
     for i in range(0, p+1):
-        text += f"[{i}] y1: {y_v[i]:.6f} | z1: {z_v[i]:.6f}\n"
+        text += f"[{i}] \ny1: {y_v[i]:.6f} \nz1: {z_v[i]:.6f}\n\n"
     
     result_text2.delete('1.0', tk.END)
     result_text2.insert(tk.END, text)                  
@@ -188,7 +188,7 @@ def solve_edo(x0, x_final, y0, z0, n, p):
 root = tk.Tk()
 root.title("Resolver EDO's de 1nd e 2nd Ordem")
 
-root.geometry("800x600")
+root.geometry("300x575")
 
 # Criar um nootbok (aba)
 notebook = ttk.Notebook(root)
@@ -199,7 +199,7 @@ notebook.pack(fill='both', expand=True)
 tab1 = ttk.Frame(notebook)
 notebook.add(tab1, text='1° Ordem')  
 
-
+# Valores pedidos ao usuario
 derivative_label1 = tk.Label(tab1, text="Digite a derivada de y (y'): ")
 derivative_label1.pack(pady=(10, 0))
 
@@ -240,25 +240,28 @@ p_entry1.pack()
 # Botão para calcular y1
 solve_button1 = tk.Button(tab1, text="Calcular y1", command=convert_to_first_orderi, bd=2, bg = '#107db2', fg ='white'
                             , font = ('verdana', 8, 'bold'))
-solve_button1.pack(pady=(20, 0))
+solve_button1.pack(pady=(40, 0))
 
 # Botão para calcular y1
 solve_button2 = tk.Button(tab1, text="Listar y1", command=convert_to_first_orderl, bd=2, bg = '#107db2', fg ='white'
                             , font = ('verdana', 8, 'bold'))
-solve_button2.pack(pady=(20, 0))
+solve_button2.pack(pady=(10, 0))
 
 
 # Rótulo para mostrar o resultado final de y1
 result_label1 = tk.Label(tab1, text="")
 result_label1.pack(pady=(10, 10))
 
+# Lista de valores
+result_frame1 = tk.Frame(tab1)
+result_frame1.pack()
 
-result_text1 = tk.Text(tab1, wrap=tk.WORD)
-result_text1.pack(pady=(10, 10))
+result_text1 = tk.Text(result_frame1, wrap=tk.WORD, width=25, height=7.5)
+result_text1.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")  # Use grid
 
-# Criar uma barra de rolagem vertical e associá-la ao widget Text
-scrollbar1 = tk.Scrollbar(tab1, command=result_text1.yview)
-scrollbar1.pack(side=tk.RIGHT, fill=tk.Y)
+scrollbar1 = tk.Scrollbar(result_frame1, command=result_text1.yview)
+scrollbar1.grid(row=0, column=1, sticky="ns")  # Use grid
+
 result_text1.config(yscrollcommand=scrollbar1.set)
 
 #######################
@@ -267,12 +270,12 @@ result_text1.config(yscrollcommand=scrollbar1.set)
 tab2 = ttk.Frame(notebook)
 notebook.add(tab2, text='2° Ordem')
 
+# Valores pedidos ao usuario
 equation_label2 = tk.Label(tab2, text="Entre com a EDO (use x, y e dydx)")
-equation_label2.pack()
+equation_label2.pack(pady=(10,0))
 
 equation_entry2 = tk.Entry(tab2)
 equation_entry2.pack()
-
 
 x0_inicial_label2 = tk.Label(tab2, text="Digite o valor inicial de x, (x0): ")
 x0_inicial_label2.pack()
@@ -304,7 +307,6 @@ n_label2.pack()
 n_entry2 = tk.Entry(tab2)
 n_entry2.pack()
 
-
 p_label2 = tk.Label(tab2, text="ponto desejado (p): ")
 p_label2.pack()
 
@@ -319,25 +321,24 @@ solve_button3.pack(pady=(10, 0))
 # Botão para listar y1
 solve_button4 = tk.Button(tab2, text="Listar y1 e z1", command=iniciarl, bd=2, bg = '#107db2', fg ='white'
                             , font = ('verdana', 8, 'bold'))
-solve_button4.pack(pady=(20, 0))
+solve_button4.pack(pady=(10, 0))
 
 # Rótulo para mostrar o resultado final de y1
 result_label3 = tk.Label(tab2, text="")
-result_label3.pack(pady=(20, 0))
+result_label3.pack(pady=(10, 0))
 
 
-result_text2 = tk.Text(tab2, wrap=tk.WORD)
-result_text2.pack(pady=(10, 10))
+# Lista de valores
+result_frame2 = tk.Frame(tab2)
+result_frame2.pack()
 
-# Criar uma barra de rolagem vertical e associá-la ao widget Text
-scrollbar2 = tk.Scrollbar(tab2, command=result_text2.yview)
-scrollbar2.pack(side=tk.RIGHT, fill=tk.Y)
+result_text2 = tk.Text(result_frame2, wrap=tk.WORD, width=25, height=7.5)
+result_text2.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")  # Use grid
+
+scrollbar2 = tk.Scrollbar(result_frame2, command=result_text2.yview)
+scrollbar2.grid(row=0, column=1, sticky="ns")  # Use grid
+
 result_text2.config(yscrollcommand=scrollbar2.set)
-
-# Rótulo para lista o resultado final de y1 e z1
-result_label4 = tk.Label(tab2, text="")
-result_label4.pack(pady=(10, 0))
-
 ##############
 
 
