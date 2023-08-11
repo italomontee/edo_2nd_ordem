@@ -379,9 +379,7 @@ result_text2.config(yscrollcommand=scrollbar2.set)
 
 def on_configure(event):
     canvas3.configure(scrollregion=canvas3.bbox("all"))
-    canvas3.config(width=event.width)
-    canvas3.itemconfig(frame_aux_id, width=event.width)
-
+    
 # Criando aba
 tab3 = ttk.Frame(notebook)
 notebook.add(tab3, text='3° Ordem')  
@@ -391,15 +389,16 @@ canvas3 = tk.Canvas(tab3)
 canvas3.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
 
 # Criando Scroll
-scroll = ttk.Scrollbar(root, orient=tk.VERTICAL, command=canvas3.yview)
+scroll = ttk.Scrollbar(tab3, orient=tk.VERTICAL, command=canvas3.yview)
 scroll.pack(side=tk.RIGHT, fill=tk.Y)
+
+canvas3.configure(yscrollcommand=scroll.set )
+canvas3.bind('<Configure>',on_configure)
 
 # Criando frame dentro do canvas
 frame_aux = tk.Frame(canvas3)
 
-canvas3.configure(yscrollcommand=scroll.set )
-frame_aux_id = canvas3.create_window((0,0), window=frame_aux, anchor = "nw" )
-canvas3.bind('<Configure>',on_configure)
+canvas3.create_window((0,0), window=frame_aux, anchor = "nw" )
 
 # Valores pedidos ao usuario
 derivative_label3 = tk.Label(frame_aux, text="Digite a derivada de y (y'): ")
