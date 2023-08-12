@@ -5,6 +5,8 @@ import tkinter as tk
 from tkinter import ttk
 import matplotlib.pyplot as plt
 
+
+
 # 1 ORDEM ############
 
 def plot_graph_first_order():
@@ -20,9 +22,9 @@ def plot_graph_first_order():
 
 def inciar_1nd_ordem_i():
     p = int(p_entry1.get())
-    
-    x = Symbol('x')
-    y = Function('y')(x)
+
+    x_1 = Symbol('x')
+    y_1 = Function('y')(x_1)
 
     equation_str = equation_entry1.get()
 
@@ -41,12 +43,11 @@ def inciar_1nd_ordem_i():
 
 def inciar_1nd_ordem_l():
     p = int(p_entry1.get())
-
-    x = Symbol('x')
-    y = Function('y')(x)
+    
+    x_1 = Symbol('x')
+    y_1 = Function('y')(x_1)
 
     equation_str = equation_entry1.get()
-
 
     # Convertendo a string da equação para a forma simbólica
     equation_str = equation_str.replace("y''", "y'")
@@ -73,11 +74,11 @@ def solve_edo1(equation_str):
     derivative_str = equation_str
 
     # Definir a variável simbólica para x e y
-    x, y = symbols('x y')
+    x_1, y_1 = symbols('x y')
 
     # Definir a função f(x, y) como a derivada de y (y')
     derivative_expr = sympify(derivative_str)
-    f = lambdify((x, y), derivative_expr, modules=['numpy'])
+    f = lambdify((x_1, y_1), derivative_expr, modules=['numpy'])
 
     # Resolvendo a equação usando o método de Runge-Kutta
     x_values, y_values = runge_kutta_4th_order(f, x0, y0, x_final, n)
@@ -125,7 +126,7 @@ def plot_graph_second_order():
     plt.show()
 
 def inciar_2nd_ordem_i():
-    global x_sym, y_sym, dydx_sym, equation
+    global x_2_sym, y_2_sym, dydx_2_sym, equation_2
 
     # Solicitar informações do usuário
     p = int(p_entry2.get())
@@ -136,12 +137,12 @@ def inciar_2nd_ordem_i():
     n = int(n_entry2.get())
 
     #Definir simbolos
-    x_sym = Symbol('x')
-    y_sym = Function('y')(x_sym)
-    dydx_sym = Function('dydx')(x_sym)
+    x_2_sym = Symbol('x')
+    y_2_sym = Function('y')(x_sym)
+    dydx_2_sym = Function('dydx')(x_sym)
 
-    equation = equation_entry2.get()
-    equation = sympify(equation)
+    equation_2 = equation_entry2.get()
+    equation_2 = sympify(equation_2)
 
     y_v, z_v = solve_edo2(x0, x_final, y0, z0, n, p)
 
@@ -149,7 +150,7 @@ def inciar_2nd_ordem_i():
                             , font = ('verdana', 8, 'bold'))
 
 def inciar_2nd_ordem_l():
-    global x_sym, y_sym, dydx_sym, equation
+    global x_2_sym, y_2_sym, dydx_2_sym, equation_2
 
     # Solicitar informações do usuário
     p = int(p_entry2.get())
@@ -160,12 +161,12 @@ def inciar_2nd_ordem_l():
     n = int(n_entry2.get())
 
     #Definir simbolos
-    x_sym = Symbol('x')
-    y_sym = Function('y')(x_sym)
-    dydx_sym = Function('dydx')(x_sym)
+    x_2_sym = Symbol('x')
+    y_2_sym = Function('y')(x_sym)
+    dydx_2_sym = Function('dydx')(x_sym)
 
-    equation = equation_entry2.get()
-    equation = sympify(equation)
+    equation_2 = equation_entry2.get()
+    equation_2 = sympify(equation_2)
 
     y_v, z_v = solve_edo2(x0, x_final, y0, z0, n, p)
 
@@ -180,7 +181,7 @@ def inciar_2nd_ordem_l():
 def system_of_odes2(x, y_z):
     y, z = y_z
     dydx = z
-    dzdx = eval(str(lambdify((x_sym, y_sym, dydx_sym), equation)(x, y, dydx)))
+    dzdx = eval(str(lambdify((x_2_sym, y_2_sym, dydx_2_sym), equation_2)(x, y, dydx)))
     return [dydx, dzdx]
 
 def solve_edo2(x0, x_final, y0, z0, n, p):
@@ -210,7 +211,8 @@ def solve_edo2(x0, x_final, y0, z0, n, p):
 # 3 ORDEM ############
 
 def inciar_3nd_ordem_i():
-    global x_sym, y_sym, dydx_sym, d2ydx2_sym, equation3
+    global x_3_sym, y_3_sym, dydx_3_sym, dy2dx_3_sym, equation_3
+
 
     # Solicitar informações do usuário
     
@@ -222,14 +224,14 @@ def inciar_3nd_ordem_i():
     n = int(np_entry3.get())
     p = int(p_entry3.get())
 
-    #Definir simbolos
-    x_sym = Symbol('x')
-    y_sym = Function('y')(x_sym)
-    dydx_sym = Function('dydx')(x_sym) 
-    d2ydx2_sym = Function("d2ydx2")(x_sym) 
-    equation3 = equation_entry3.get()
-    equation3 = equation3.replace('d2ydx2', 'y.diff(x, 2)')
-    equation3 = sympify(equation3)
+    x_3_sym = Symbol('x')
+    y_3_sym = Function('y')(x_sym)
+    dydx_3_sym = Function('dydx')(x_sym)
+    dy2dx_3_sym = Function('dydx')(x_sym)
+
+    
+    equation_3 = equation_entry3.get()
+    equation_3 = sympify(equation_3)
 
     y_v, z_v, w_v = solve_edo3(x0, x_final, y0, z0, w0, n, p)
 
@@ -240,7 +242,7 @@ def system_of_odes3(x, yzw):
     y, z, w = yzw
     dydx = z
     dzdx = w
-    dwdx = eval(str(lambdify((x_sym, y_sym, dydx_sym, d2ydx2_sym), equation3)(x, y, dydx, dzdx)))
+    dwdx = eval(str(lambdify((x_3_sym, y_3_sym, dydx_3_sym, dy2dx_3_sym), equation_3)(x, y, dydx, dzdx)))
     return [dydx, dzdx, dwdx]
 
 def solve_edo3(x0, x_final, y0, z0, w0, n, p):
