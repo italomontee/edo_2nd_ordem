@@ -3,9 +3,12 @@ from scipy.integrate import solve_ivp
 from sympy import *
 import tkinter as tk
 from tkinter import ttk
+import matplotlib.pyplot as plt
+
+# 1 ORDEM ############
 
 def plot_graph_first_order():
-    x_values, y_values = solve_runge_kutta(derivative_entry1.get())
+    x_values, y_values = solve_edo1(derivative_entry1.get())
     plt.figure(figsize=(8, 6))
     plt.plot(x_values, y_values, label="y(x)")
     plt.xlabel("x")
@@ -26,7 +29,7 @@ def inciar_1nd_ordem_i():
     equation_str = equation_str.replace("y'", "y")
     eq1 = eval(equation_str)
 
-    x_v, y_v = solve_runge_kutta(equation_str)
+    x_v, y_v = solve_edo1(equation_str)
     
     y1 = y_v[p]
 
@@ -45,7 +48,7 @@ def inciar_1nd_ordem_l():
     equation_str = equation_str.replace("y'", "y")
     eq1 = eval(equation_str)
 
-    x_v, y_v = solve_runge_kutta(equation_str)
+    x_v, y_v = solve_edo1(equation_str)
 
     text = ""
     
@@ -55,7 +58,7 @@ def inciar_1nd_ordem_l():
     result_text1.delete('1.0', tk.END)
     result_text1.insert(tk.END, text)
     
-def solve_runge_kutta(equation_str):
+def solve_edo1(equation_str):
     # Obter os valores informados pelo usuário
     x0 = float(x0_entry1.get())
     x_final = float(x0_final_entry1.get())
@@ -101,10 +104,10 @@ def runge_kutta_4th_order(f, x0, y0, x_max, n):
 
     return x_values, y_values
 
-# 3 ORDEM ############
+# 2 ORDEM ############
 
 def plot_graph_second_order():
-    y_values, _ = solve_edo(float(x0_inicial_entry2.get()), float(x0_final_entry2.get()),
+    y_values, _ = solve_edo2(float(x0_inicial_entry2.get()), float(x0_final_entry2.get()),
                              float(y0_entry2.get()), float(z0_entry2.get()), int(n_entry2.get()), int(p_entry2.get()))
 
     plt.figure(figsize=(8, 6))
@@ -135,9 +138,9 @@ def inciar_2nd_ordem_i():
     equation = equation_entry2.get()
     equation = sympify(equation)
 
-    x_v, y_v = solve_edo(x0, x_final, y0, z0, n, p)
+    y_v, z_v = solve_edo2(x0, x_final, y0, z0, n, p)
 
-    result_label3.config(text=f"y1 = {y_values[p]:.6f}, z1 = {z_values[p]:.6f}",  bd=2, bg = '#107db2', fg ='white'
+    result_label2.config(text=f"y1 = {y_v[p]:.6f}, z1 = {z_v[p]:.6f}",  bd=2, bg = '#107db2', fg ='white'
                             , font = ('verdana', 8, 'bold'))
 
 def inciar_2nd_ordem_l():
@@ -159,7 +162,7 @@ def inciar_2nd_ordem_l():
     equation = equation_entry2.get()
     equation = sympify(equation)
 
-    y_v, z_v = solve_edo(x0, x_final, y0, z0, n, p)
+    y_v, z_v = solve_edo2(x0, x_final, y0, z0, n, p)
 
     text = ""
     
@@ -169,13 +172,13 @@ def inciar_2nd_ordem_l():
     result_text2.delete('1.0', tk.END)
     result_text2.insert(tk.END, text)                  
 
-def system_of_odes(x, y_z):
+def system_of_odes2(x, y_z):
     y, z = y_z
     dydx = z
     dzdx = eval(str(lambdify((x_sym, y_sym, dydx_sym), equation)(x, y, dydx)))
     return [dydx, dzdx]
 
-def solve_edo(x0, x_final, y0, z0, n, p):
+def solve_edo2(x0, x_final, y0, z0, n, p):
 
     global x_values
     global y_values
@@ -188,7 +191,7 @@ def solve_edo(x0, x_final, y0, z0, n, p):
     initial_conditions = [y0, z0]
 
     # Resolver o sistema usando o método de Runge-Kutta de 4ª ordem
-    solution = solve_ivp(system_of_odes, x_span, initial_conditions, method='RK45', t_eval=np.linspace(x0, x_final, n+1))
+    solution = solve_ivp(system_of_odes2, x_span, initial_conditions, method='RK45', t_eval=np.linspace(x0, x_final, n+1))
 
     # Obter os resultados
     x_values = solution.t
@@ -199,7 +202,63 @@ def solve_edo(x0, x_final, y0, z0, n, p):
     #result_label2.config(text=f"y1 = {y_values[p]:.6f}, z1 = {z_values[p]:.6f}",  bd=2, bg = '#107db2', fg ='white'
     #                        , font = ('verdana', 8, 'bold'))
 
-# 2 ORDEM ############
+# 3 ORDEM ############
+
+def inciar_3nd_ordem_i():
+    global x_sym, y_sym, dydx_sym, dy2dx_sym, equation
+
+    # Solicitar informações do usuário
+    
+    x0 = float(x0_entry3.get())
+    x_final = float(x0_final_entry3.get())
+    y0 = float(y0_entry3.get())
+    z0 = float(z0_entry3.get())
+    w0 = float(w0_entry3.get())
+    n = int(np_entry3.get())
+    p = int(p_entry3.get())
+
+    #Definir simbolos
+    x_sym = Symbol('x')
+    y_sym = Function('y')(x_sym)
+    dydx_sym = Function('dydx')(x_sym)
+    dy2dx_sym = Function('dy2dx')(x_sym)
+
+    equation = equation_entry3.get()
+    equation = sympify(equation)
+
+    y_v, z_v, w_v = solve_edo3(x0, x_final, y0, z0, w0, n, p)
+
+    result_label3.config(text=f"y1 = {y_v[p]:.6f}, z1 = {z_v[p]:.6f}, w1 = {w_v[p]:.6f}",  bd=2, bg = '#107db2', fg ='white'
+                            , font = ('verdana', 8, 'bold'))
+
+def system_of_odes3(x, yzw):
+    y, z, w = yzw
+    dydx = z
+    dzdx = w
+    dwdx = eval(str(lambdify((x_sym, y_sym, dydx_sym, dy2dx_sym), equation)(x, y, w, dzdx)))
+    return [dydx, dzdx, dwdx]
+
+def solve_edo3(x0, x_final, y0, z0, w0, n, p):
+
+    global x_values
+    global y_values
+    global z_values
+    global w_values
+
+    # Definir o intervalo de integração
+    x_span = (x0, x_final)
+
+    # Definir as condições iniciais
+    initial_conditions = [y0, z0, w0]
+
+    # Resolver o sistema usando o método de Runge-Kutta de 4ª ordem
+    solution = solve_ivp(system_of_odes3, x_span, initial_conditions, method='RK45', t_eval=np.linspace(x0, x_final, n+1))
+
+    # Obter os resultados
+    x_values = solution.t
+    y_values, z_values, w_values = solution.y
+
+    return y_values, z_values, w_values
 
 ##Parte Grafica
 
@@ -357,8 +416,8 @@ plot_button_second_order.pack(pady=(10, 0))
 
 
 # Rótulo para mostrar o resultado final de y1
-result_label3 = tk.Label(tab2, text="")
-result_label3.pack(pady=(10, 0))
+result_label2 = tk.Label(tab2, text="")
+result_label2.pack(pady=(10, 0))
 
 
 # Lista de valores
@@ -401,11 +460,11 @@ frame_aux = tk.Frame(canvas3)
 canvas3.create_window((0,0), window=frame_aux, anchor = "nw" )
 
 # Valores pedidos ao usuario
-derivative_label3 = tk.Label(frame_aux, text="Digite a derivada de y (y'): ")
-derivative_label3.pack(pady=(10,0))
+equation_label3 = tk.Label(frame_aux, text="Digite a derivada de y (y'): ")
+equation_label3.pack(pady=(10,0))
 
-derivative_entry3 = tk.Entry(frame_aux)
-derivative_entry3.pack(pady=(5,0))
+equation_entry3 = tk.Entry(frame_aux)
+equation_entry3.pack(pady=(5,0))
 
 
 x0_label3 = tk.Label(frame_aux, text="Digite o valor inicial de x (x0): ")
@@ -453,14 +512,11 @@ p_entry3 = tk.Entry(frame_aux)
 p_entry3.pack(pady=(5,0))
 
 # Botão para calcular y1
-solve_button5 = tk.Button(frame_aux, text="Calcular y1", command=inciar_1nd_ordem_i, bd=2, bg = '#107db2', fg ='white'
+solve_button5 = tk.Button(frame_aux, text="Calcular y1", command=inciar_3nd_ordem_i, bd=2, bg = '#107db2', fg ='white'
                             , font = ('verdana', 8, 'bold'))
 solve_button5.pack(pady=(5,0))
 
-# Botão para calcular y1
-solve_button6 = tk.Button(frame_aux, text="Listar y1", command=inciar_1nd_ordem_l, bd=2, bg = '#107db2', fg ='white'
-                            , font = ('verdana', 8, 'bold'))
-solve_button6.pack(pady=(5,0))
+
 
 #Botão para plotar y/x
 # Botão para plotar grafico 
