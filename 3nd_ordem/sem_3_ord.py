@@ -400,7 +400,7 @@ y0_entry2.pack()
 z0_label2 = tk.Label(tab2, text="Digite o valor inicial de z, y'(x0): ")
 z0_label2.pack()
 
-z0_entry2 = tk.Entry(tab2)
+ = tk.Entry(tab2)
 z0_entry2.pack()
 
 n_label2 = tk.Label(tab2, text="numero de pontos (n): ")
