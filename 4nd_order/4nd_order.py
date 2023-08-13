@@ -452,7 +452,7 @@ def runge_kutta_4th_order_edo_4th_order(f, x0, y0, y_prime0, y_double_prime0, y_
 root = tk.Tk()
 root.title("Resolver EDO's de 1nd e 2nd Ordem")
 
-root.geometry("400x500")
+root.geometry("430x500")
 
 root.rowconfigure(0, weight=1)
 root.columnconfigure(0, weight=1)
@@ -488,7 +488,7 @@ canvas1.create_window((0,0), window=frame_aux1, anchor = "nw" )
 
 # Valores pedidos ao usuario
 equation_label1 = tk.Label(frame_aux1, text="Digite a derivada de y (y'): ")
-equation_label1.pack(pady=(10, 0))
+equation_label1.pack(pady=(10, 0), padx=(120,120))
 
 equation_entry1 = tk.Entry(frame_aux1)
 equation_entry1.pack()
@@ -585,7 +585,7 @@ canvas2.create_window((0,0), window=frame_aux2, anchor = "nw" )
 
 # Valores pedidos ao usuario
 equation_label2 = tk.Label(frame_aux2, text="Digite a segunda derivada de y (y''): ")
-equation_label2.pack(pady=(10,0))
+equation_label2.pack(pady=(10,0), padx=(100,100))
 
 equation_entry2 = tk.Entry(frame_aux2)
 equation_entry2.pack()
@@ -688,7 +688,7 @@ canvas3.create_window((0,0), window=frame_aux3, anchor = "nw" )
 
 # Valores pedidos ao usuario
 equation_label3 = tk.Label(frame_aux3, text="Digite a terceira derivada de y (y'''): ")
-equation_label3.pack(pady=(10,0))
+equation_label3.pack(pady=(10,0), padx=(100,100))
 
 equation_entry3 = tk.Entry(frame_aux3)
 equation_entry3.pack(pady=(5,0))
@@ -799,7 +799,7 @@ canvas4.create_window((0,0), window=frame_aux4, anchor = "nw" )
 
 # Valores pedidos ao usuario
 equation_label4 = tk.Label(frame_aux4, text="Digite a quarta derivada de y (y''''): ")
-equation_label4.pack(pady=(10,0))
+equation_label4.pack(pady=(10,0), padx=(100,100))
 
 equation_entry4 = tk.Entry(frame_aux4)
 equation_entry4.pack(pady=(5,0))
@@ -855,6 +855,7 @@ p_label4.pack(pady=(5,0))
 p_entry4 = tk.Entry(frame_aux4)
 p_entry4.pack(pady=(5,0))
 
+
 # Botão para calcular y1
 solve_button4_1 = tk.Button(frame_aux4, text="Calcular y1", command=inciar_4nd_ordem_i, bd=2, bg = '#107db2', fg ='white'
                             , font = ('verdana', 8, 'bold'))
@@ -863,7 +864,7 @@ solve_button4_1.pack(pady=(5,0))
 
 #Botão para plotar y/x
 # Botão para plotar grafico 
-solve_button4_2 = tk.Button(frame_aux4, text="Listar y1, z1, w1", command=inciar_4nd_ordem_l, bd=2, bg='#107db2',
+solve_button4_2 = tk.Button(frame_aux4, text="Listar y1, z1, w1, j1", command=inciar_4nd_ordem_l, bd=2, bg='#107db2',
                                       fg='white', font=('verdana', 8, 'bold'))
 solve_button4_2.pack(pady=(10, 0))
 # Botão para plotar grafico 
