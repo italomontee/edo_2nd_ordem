@@ -73,12 +73,12 @@ def solve_edo1(equation_str):
     f = lambdify((x, y), derivative_expr, modules=['numpy'])
 
     # Resolvendo a equação usando o método de Runge-Kutta
-    x_values, y_values = runge_kutta_4th_order(f, x0, y0, x_final, n)
+    x_values, y_values = runge_kutta_4th_order_edo_1th_order(f, x0, y0, x_final, n)
 
     
     return x_values, y_values
 
-def runge_kutta_4th_order(f, x0, y0, x_max, n):
+def runge_kutta_4th_order_edo_1th_order(f, x0, y0, x_max, n):
     # Implementar o método de Runge-Kutta de quarta ordem aqui
     # Retornar os valores de x e y para o intervalo de interesse
     h = (x_max-x0)/n
@@ -202,6 +202,17 @@ def solve_edo2(x0, x_final, y0, z0, n, p):
 
 # 3 ORDEM ############
 
+def plot_graph_third_order():
+    x_values, y_values, _, _ = solve_edo3(equation_entry3.get())
+    plt.figure(figsize=(8, 6))
+    plt.plot(x_values, y_values, label="y(x)")
+    plt.xlabel("x")
+    plt.ylabel("y")
+    plt.title("Gráfico de y em função de x")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
 def inciar_3nd_ordem_i():
     
     p = int(p_entry3.get())
@@ -223,6 +234,30 @@ def inciar_3nd_ordem_i():
     result_label3.config(text=f"y1 = {y1:.6f}",  bd=2, bg = '#107db2', fg ='white'
                             , font = ('verdana', 8, 'bold'))
 
+def inciar_3nd_ordem_l():
+    
+    p = int(p_entry3.get())
+    
+    x = Symbol('x')
+    y = Function('y')(x)
+    dydx = Function('dydxy')(x)
+    d2ydx2 = Function('d2ydx2')(x)
+
+    equation_str = equation_entry3.get()
+
+    eq1 = eval(equation_str)
+
+    x_v, y_v, z_v, w_v= solve_edo3(equation_str)
+    
+
+    text = ""
+    
+    for i in range(0, p+1):
+        text += f"[{i}] \ny1: {y_v[i]:.6f} \nz1: {z_v[i]:.6f}\nw1: {w_v[i]:.6f}\n\n"
+    
+    result_text3.delete('1.0', tk.END)
+    result_text3.insert(tk.END, text)
+
 def solve_edo3(equation_str):
 
     # Obter os valores informados pelo usuário
@@ -243,11 +278,11 @@ def solve_edo3(equation_str):
     f = lambdify((x, y, dydx, d2ydx2), derivative_expr, modules=['numpy'])
 
     # Resolvendo a equação usando o método de Runge-Kutta
-    x_values, y_values, z_values, w_values = runge_kutta_third_order(f, x0, y0, z0, w0, h, n)
+    x_values, y_values, z_values, w_values = runge_kutta_4th_order_edo_3th_order(f, x0, y0, z0, w0, h, n)
   
     return x_values, y_values, z_values, w_values
 
-def runge_kutta_third_order(f, x0, y0, y_prime0, y_double_prime0, h, num_points):
+def runge_kutta_4th_order_edo_3th_order(f, x0, y0, y_prime0, y_double_prime0, h, num_points):
      # Inicializar listas para armazenar os resultados
     x_values = [x0]
     y_values = [y0]
@@ -543,7 +578,12 @@ solve_button3_1.pack(pady=(5,0))
 
 #Botão para plotar y/x
 # Botão para plotar grafico 
-plot_button_3 = tk.Button(tab3, text="Plotar Gráfico", command=plot_graph_second_order, bd=2, bg='#107db2',
+solve_button3_2 = tk.Button(frame_aux, text="Listar y1, z1, w1", command=inciar_3nd_ordem_l, bd=2, bg='#107db2',
+                                      fg='white', font=('verdana', 8, 'bold'))
+solve_button3_2.pack(pady=(10, 0))
+# Botão para plotar grafico 
+
+plot_button_3 = tk.Button(frame_aux, text="Plotar Gráfico", command=plot_graph_third_order, bd=2, bg='#107db2',
                                       fg='white', font=('verdana', 8, 'bold'))
 plot_button_3.pack(pady=(10, 0))
 
