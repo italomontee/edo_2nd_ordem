@@ -36,7 +36,7 @@ def system_of_odes3(x, yzw):
     y, z, w = yzw
     dydx = z
     dzdx = w
-    dwdx = eval(str(lambdify((x_sym, y_sym, dydx_sym, dy2dx_sym), equation)(x, y, w, dzdx)))
+    dwdx = eval(str(lambdify((x_sym, y_sym, dydx_sym, dy2dx_sym), equation)(x, y, z, w, dy2dx)))
     return [dydx, dzdx, dwdx]
 
 def solve_edo3(x0, x_final, y0, z0, w0, n, p):

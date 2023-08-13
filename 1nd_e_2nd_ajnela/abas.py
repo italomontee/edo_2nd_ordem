@@ -10,9 +10,6 @@ def convert_to_first_orderi():
     x = Symbol('x')
     y = Function('y')(x)
 
-    # Convertendo a string da equação para a forma simbólica
-    equation_str = equation_str.replace("y''", "y'")
-    equation_str = equation_str.replace("y'", "y")
     eq1 = eval(equation_str)
 
     x_v, y_v = solve_runge_kutta(equation_str)

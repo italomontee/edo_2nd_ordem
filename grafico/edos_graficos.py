@@ -5,7 +5,7 @@ import tkinter as tk
 from tkinter import ttk
 import matplotlib.pyplot as plt
 
-def plot_graph():
+def plot_graph_first_order():
     x_values, y_values = solve_runge_kutta(derivative_entry1.get())
     plt.figure(figsize=(8, 6))
     plt.plot(x_values, y_values, label="y(x)")
@@ -15,7 +15,6 @@ def plot_graph():
     plt.legend()
     plt.grid(True)
     plt.show()
-
 
 def convert_to_first_orderi():
     p = int(p_entry1.get())
@@ -56,7 +55,6 @@ def convert_to_first_orderl():
     
     result_text1.delete('1.0', tk.END)
     result_text1.insert(tk.END, text)
-
     
 def solve_runge_kutta(equation_str):
     # Obter os valores informados pelo usuário
@@ -105,6 +103,7 @@ def runge_kutta_4th_order(f, x0, y0, x_max, n):
     return x_values, y_values
 
 #############
+
 def plot_graph_second_order():
     y_values, _ = solve_edo(float(x0_inicial_entry2.get()), float(x0_final_entry2.get()),
                              float(y0_entry2.get()), float(z0_entry2.get()), int(n_entry2.get()), int(p_entry2.get()))
