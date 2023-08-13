@@ -452,7 +452,7 @@ def runge_kutta_4th_order_edo_4th_order(f, x0, y0, y_prime0, y_double_prime0, y_
 root = tk.Tk()
 root.title("Resolver EDO's de 1nd e 2nd Ordem")
 
-root.geometry("300x600")
+root.geometry("400x500")
 
 root.rowconfigure(0, weight=1)
 root.columnconfigure(0, weight=1)
@@ -461,152 +461,194 @@ root.columnconfigure(0, weight=1)
 notebook = ttk.Notebook(root)
 notebook.pack(fill='both', expand=True)
 
+
 # Primeira aba
+def on_configure1(event):
+    canvas1.configure(scrollregion=canvas1.bbox("all"))
+    
+
 tab1 = ttk.Frame(notebook)
 notebook.add(tab1, text='1° Ordem')  
 
+# Criando Canvas
+canvas1 = tk.Canvas(tab1)
+canvas1.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
+
+# Criando Scroll
+scrollbar1_1 = ttk.Scrollbar(tab1, orient=tk.VERTICAL, command=canvas1.yview)
+scrollbar1_1.pack(side=tk.RIGHT, fill=tk.Y)
+
+canvas1.configure(yscrollcommand=scrollbar1_1.set )
+canvas1.bind('<Configure>',on_configure1)
+
+# Criando frame dentro do canvas
+frame_aux1 = tk.Frame(canvas1)
+
+canvas1.create_window((0,0), window=frame_aux1, anchor = "nw" )
+
 # Valores pedidos ao usuario
-equation_label1 = tk.Label(tab1, text="Digite a derivada de y (y'): ")
+equation_label1 = tk.Label(frame_aux1, text="Digite a derivada de y (y'): ")
 equation_label1.pack(pady=(10, 0))
 
-equation_entry1 = tk.Entry(tab1)
+equation_entry1 = tk.Entry(frame_aux1)
 equation_entry1.pack()
 
 
-x0_label1 = tk.Label(tab1, text="Digite o valor inicial de x (x0): ")
+x0_label1 = tk.Label(frame_aux1, text="Digite o valor inicial de x (x0): ")
 x0_label1.pack()
 
-x0_entry1 = tk.Entry(tab1)
+x0_entry1 = tk.Entry(frame_aux1)
 x0_entry1.pack()
 
-x0_final_label1 = tk.Label(tab1, text="Digite o valor final de x (xf): ")
+x0_final_label1 = tk.Label(frame_aux1, text="Digite o valor final de x (xf): ")
 x0_final_label1.pack()
 
-x0_final_entry1 = tk.Entry(tab1)
+x0_final_entry1 = tk.Entry(frame_aux1)
 x0_final_entry1.pack()
 
-y0_label1 = tk.Label(tab1, text="Digite o valor inicial de y (y0): ")
+y0_label1 = tk.Label(frame_aux1, text="Digite o valor inicial de y (y0): ")
 y0_label1.pack()
 
-y0_entry1 = tk.Entry(tab1)
+y0_entry1 = tk.Entry(frame_aux1)
 y0_entry1.pack()
 
-n_label1 = tk.Label(tab1, text="Digite a quantidade de pontos (np): ")
+n_label1 = tk.Label(frame_aux1, text="Digite a quantidade de pontos (np): ")
 n_label1.pack()
 
-np_entry1 = tk.Entry(tab1)
+np_entry1 = tk.Entry(frame_aux1)
 np_entry1.pack()
 
-p_label1 = tk.Label(tab1, text="Digite o ponto que deseja (p): ")
+p_label1 = tk.Label(frame_aux1, text="Digite o ponto que deseja (p): ")
 p_label1.pack()
 
-p_entry1 = tk.Entry(tab1)
+p_entry1 = tk.Entry(frame_aux1)
 p_entry1.pack()
 
 # Botão para calcular y1
-solve_button1_1 = tk.Button(tab1, text="Calcular y1", command=inciar_1nd_ordem_i, bd=2, bg = '#107db2', fg ='white'
+solve_button1_1 = tk.Button(frame_aux1, text="Calcular y1", command=inciar_1nd_ordem_i, bd=2, bg = '#107db2', fg ='white'
                             , font = ('verdana', 8, 'bold'))
 solve_button1_1.pack(pady=(20, 0))
 
 # Botão para calcular y1
-solve_button1_2 = tk.Button(tab1, text="Listar y1", command=inciar_1nd_ordem_l, bd=2, bg = '#107db2', fg ='white'
+solve_button1_2 = tk.Button(frame_aux1, text="Listar y1", command=inciar_1nd_ordem_l, bd=2, bg = '#107db2', fg ='white'
                             , font = ('verdana', 8, 'bold'))
 solve_button1_2.pack(pady=(10, 0))
 
 # Botaão para plotar y/x
-plot_button_1 = tk.Button(tab1, text="Plotar Gráfico", command=plot_graph_first_order, bd=2, bg='#107db2', fg='white',
+plot_button_1 = tk.Button(frame_aux1, text="Plotar Gráfico", command=plot_graph_first_order, bd=2, bg='#107db2', fg='white',
                         font=('verdana', 8, 'bold'))
 plot_button_1.pack(pady=(10, 0))
 
 
 # Rótulo para mostrar o resultado final de y1
-result_label1 = tk.Label(tab1, text="")
+result_label1 = tk.Label(frame_aux1, text="")
 result_label1.pack(pady=(10, 10))
 
 # Lista de valores
-result_frame1 = tk.Frame(tab1)
+result_frame1 = tk.Frame(frame_aux1)
 result_frame1.pack()
 
 result_text1 = tk.Text(result_frame1, wrap=tk.WORD, width=25, height=7.5)
 result_text1.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")  # Use grid
 
-scrollbar1 = tk.Scrollbar(result_frame1, command=result_text1.yview)
-scrollbar1.grid(row=0, column=1, sticky="ns")  # Use grid
+scrollbar1_2 = tk.Scrollbar(result_frame1, command=result_text1.yview)
+scrollbar1_2.grid(row=0, column=1, sticky="ns")  # Use grid
 
-result_text1.config(yscrollcommand=scrollbar1.set)
+result_text1.config(yscrollcommand=scrollbar1_2.set)
 
 #######################
 
 # Segunda aba
+def on_configure2(event):
+    canvas2.configure(scrollregion=canvas2.bbox("all"))
+    
+
 tab2 = ttk.Frame(notebook)
 notebook.add(tab2, text='2° Ordem')
 
+# Criando Canvas
+canvas2 = tk.Canvas(tab2)
+canvas2.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
+
+# Criando Scroll
+scrollbar2_1 = ttk.Scrollbar(tab2, orient=tk.VERTICAL, command=canvas2.yview)
+scrollbar2_1.pack(side=tk.RIGHT, fill=tk.Y)
+
+canvas2.configure(yscrollcommand=scrollbar2_1.set )
+canvas2.bind('<Configure>',on_configure2)
+
+# Criando frame dentro do canvas
+frame_aux2 = tk.Frame(canvas2)
+
+canvas2.create_window((0,0), window=frame_aux2, anchor = "nw" )
+
+
 # Valores pedidos ao usuario
-equation_label2 = tk.Label(tab2, text="Entre com a EDO (use x, y e dydx)")
+equation_label2 = tk.Label(frame_aux2, text="Digite a segunda derivada de y (y''): ")
 equation_label2.pack(pady=(10,0))
 
-equation_entry2 = tk.Entry(tab2)
+equation_entry2 = tk.Entry(frame_aux2)
 equation_entry2.pack()
 
-x0_inicial_label2 = tk.Label(tab2, text="Digite o valor inicial de x, (x0): ")
+x0_inicial_label2 = tk.Label(frame_aux2, text="Digite o valor inicial de x, (x0): ")
 x0_inicial_label2.pack()
 
-x0_inicial_entry2 = tk.Entry(tab2)
+x0_inicial_entry2 = tk.Entry(frame_aux2)
 x0_inicial_entry2.pack()
 
-x0_final_label2 = tk.Label(tab2, text="Digite o valor final de x, (xf): ")
+x0_final_label2 = tk.Label(frame_aux2, text="Digite o valor final de x, (xf): ")
 x0_final_label2.pack()
 
-x0_final_entry2 = tk.Entry(tab2)
+x0_final_entry2 = tk.Entry(frame_aux2)
 x0_final_entry2.pack()
 
-y0_label2 = tk.Label(tab2, text="Digite o valor inicial de y, y(x0): ")
+y0_label2 = tk.Label(frame_aux2, text="Digite o valor inicial de y, y(x0): ")
 y0_label2.pack()
 
-y0_entry2 = tk.Entry(tab2)
+y0_entry2 = tk.Entry(frame_aux2)
 y0_entry2.pack()
 
-z0_label2 = tk.Label(tab2, text="Digite o valor inicial de z, y'(x0): ")
+z0_label2 = tk.Label(frame_aux2, text="Digite o valor inicial de z, y'(x0): ")
 z0_label2.pack()
 
-z0_entry2 = tk.Entry(tab2)
+z0_entry2 = tk.Entry(frame_aux2)
 z0_entry2.pack()
 
-n_label2 = tk.Label(tab2, text="numero de pontos (n): ")
+n_label2 = tk.Label(frame_aux2, text="numero de pontos (n): ")
 n_label2.pack()
 
-n_entry2 = tk.Entry(tab2)
+n_entry2 = tk.Entry(frame_aux2)
 n_entry2.pack()
 
-p_label2 = tk.Label(tab2, text="ponto desejado (p): ")
+p_label2 = tk.Label(frame_aux2, text="ponto desejado (p): ")
 p_label2.pack()
 
-p_entry2 = tk.Entry(tab2)
+p_entry2 = tk.Entry(frame_aux2)
 p_entry2.pack()
 
 # Botão para calcular y1
-solve_button2_1 = tk.Button(tab2, text="Calcular y1 e z1", command=inciar_2nd_ordem_i, bd=2, bg = '#107db2', fg ='white'
+solve_button2_1 = tk.Button(frame_aux2, text="Calcular y1 e z1", command=inciar_2nd_ordem_i, bd=2, bg = '#107db2', fg ='white'
                             , font = ('verdana', 8, 'bold'))
 solve_button2_1.pack(pady=(10, 0))
 
 # Botão para listar y1
-solve_button2_2 = tk.Button(tab2, text="Listar y1 e z1", command=inciar_2nd_ordem_l, bd=2, bg = '#107db2', fg ='white'
+solve_button2_2 = tk.Button(frame_aux2, text="Listar y1 e z1", command=inciar_2nd_ordem_l, bd=2, bg = '#107db2', fg ='white'
                             , font = ('verdana', 8, 'bold'))
 solve_button2_2.pack(pady=(10, 0))
 
 # Botão para plotar grafico 
-plot_button_2 = tk.Button(tab2, text="Plotar Gráfico", command=plot_graph_second_order, bd=2, bg='#107db2',
+plot_button_2 = tk.Button(frame_aux2, text="Plotar Gráfico", command=plot_graph_second_order, bd=2, bg='#107db2',
                                       fg='white', font=('verdana', 8, 'bold'))
 plot_button_2.pack(pady=(10, 0))
 
 
 # Rótulo para mostrar o resultado final de y1
-result_label2 = tk.Label(tab2, text="")
+result_label2 = tk.Label(frame_aux2, text="")
 result_label2.pack(pady=(10, 0))
 
 
 # Lista de valores
-result_frame2 = tk.Frame(tab2)
+result_frame2 = tk.Frame(frame_aux2)
 result_frame2.pack()
 
 result_text2 = tk.Text(result_frame2, wrap=tk.WORD, width=25, height=7.5)
@@ -621,7 +663,7 @@ result_text2.config(yscrollcommand=scrollbar2.set)
 
 # Terceira aba
 
-def on_configure(event):
+def on_configure3(event):
     canvas3.configure(scrollregion=canvas3.bbox("all"))
     
 # Criando aba
@@ -633,106 +675,106 @@ canvas3 = tk.Canvas(tab3)
 canvas3.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
 
 # Criando Scroll
-scroll = ttk.Scrollbar(tab3, orient=tk.VERTICAL, command=canvas3.yview)
-scroll.pack(side=tk.RIGHT, fill=tk.Y)
+scrollbar3_1 = ttk.Scrollbar(tab3, orient=tk.VERTICAL, command=canvas3.yview)
+scrollbar3_1.pack(side=tk.RIGHT, fill=tk.Y)
 
-canvas3.configure(yscrollcommand=scroll.set )
-canvas3.bind('<Configure>',on_configure)
+canvas3.configure(yscrollcommand=scrollbar3_1.set )
+canvas3.bind('<Configure>',on_configure3)
 
 # Criando frame dentro do canvas
-frame_aux = tk.Frame(canvas3)
+frame_aux3 = tk.Frame(canvas3)
 
-canvas3.create_window((0,0), window=frame_aux, anchor = "nw" )
+canvas3.create_window((0,0), window=frame_aux3, anchor = "nw" )
 
 # Valores pedidos ao usuario
-equation_label3 = tk.Label(frame_aux, text="Digite a derivada de y (y'): ")
+equation_label3 = tk.Label(frame_aux3, text="Digite a terceira derivada de y (y'''): ")
 equation_label3.pack(pady=(10,0))
 
-equation_entry3 = tk.Entry(frame_aux)
+equation_entry3 = tk.Entry(frame_aux3)
 equation_entry3.pack(pady=(5,0))
 
 
-x0_label3 = tk.Label(frame_aux, text="Digite o valor inicial de x (x0): ")
+x0_label3 = tk.Label(frame_aux3, text="Digite o valor inicial de x (x0): ")
 x0_label3.pack(pady=(5,0))
 
 
-x0_entry3 = tk.Entry(frame_aux)
+x0_entry3 = tk.Entry(frame_aux3)
 x0_entry3.pack(pady=(5,0))
 
 
-x0_final_label3 = tk.Label(frame_aux, text="Digite o valor final de x (xf): ")
+x0_final_label3 = tk.Label(frame_aux3, text="Digite o valor final de x (xf): ")
 x0_final_label3.pack(pady=(5,0))
 
-x0_final_entry3 = tk.Entry(frame_aux)
+x0_final_entry3 = tk.Entry(frame_aux3)
 x0_final_entry3.pack(pady=(5,0))
 
-y0_label3 = tk.Label(frame_aux, text="Digite o valor inicial de y (y0): ")
+y0_label3 = tk.Label(frame_aux3, text="Digite o valor inicial de y (y0): ")
 y0_label3.pack(pady=(5,0))
 
-y0_entry3 = tk.Entry(frame_aux)
+y0_entry3 = tk.Entry(frame_aux3)
 y0_entry3.pack(pady=(5,0))
 
-z0_label3 = tk.Label(frame_aux, text="Digite o valor inicial de z, y'(x0): ")
+z0_label3 = tk.Label(frame_aux3, text="Digite o valor inicial de z, y'(x0): ")
 z0_label3.pack(pady=(5,0))
 
-z0_entry3 = tk.Entry(frame_aux)
+z0_entry3 = tk.Entry(frame_aux3)
 z0_entry3.pack(pady=(5,0))
 
-w0_label3 = tk.Label(frame_aux, text="Digite o valor inicial de w, y''(x0): ")
+w0_label3 = tk.Label(frame_aux3, text="Digite o valor inicial de w, y''(x0): ")
 w0_label3.pack(pady=(5,0))
 
-w0_entry3 = tk.Entry(frame_aux)
+w0_entry3 = tk.Entry(frame_aux3)
 w0_entry3.pack(pady=(5,0))
 
-n_label3 = tk.Label(frame_aux, text="Digite a quantidade de pontos (np): ")
+n_label3 = tk.Label(frame_aux3, text="Digite a quantidade de pontos (np): ")
 n_label3.pack(pady=(5,0))
 
-np_entry3 = tk.Entry(frame_aux)
+np_entry3 = tk.Entry(frame_aux3)
 np_entry3.pack(pady=(5,0))
 
-p_label3 = tk.Label(frame_aux, text="Digite o ponto que deseja (p): ")
+p_label3 = tk.Label(frame_aux3, text="Digite o ponto que deseja (p): ")
 p_label3.pack(pady=(5,0))
 
-p_entry3 = tk.Entry(frame_aux)
+p_entry3 = tk.Entry(frame_aux3)
 p_entry3.pack(pady=(5,0))
 
 # Botão para calcular y1
-solve_button3_1 = tk.Button(frame_aux, text="Calcular y1", command=inciar_3nd_ordem_i, bd=2, bg = '#107db2', fg ='white'
+solve_button3_1 = tk.Button(frame_aux3, text="Calcular y1", command=inciar_3nd_ordem_i, bd=2, bg = '#107db2', fg ='white'
                             , font = ('verdana', 8, 'bold'))
 solve_button3_1.pack(pady=(5,0))
 
 
 #Botão para plotar y/x
 # Botão para plotar grafico 
-solve_button3_2 = tk.Button(frame_aux, text="Listar y1, z1, w1", command=inciar_3nd_ordem_l, bd=2, bg='#107db2',
+solve_button3_2 = tk.Button(frame_aux3, text="Listar y1, z1, w1", command=inciar_3nd_ordem_l, bd=2, bg='#107db2',
                                       fg='white', font=('verdana', 8, 'bold'))
 solve_button3_2.pack(pady=(10, 0))
 # Botão para plotar grafico 
 
-plot_button_3 = tk.Button(frame_aux, text="Plotar Gráfico", command=plot_graph_third_order, bd=2, bg='#107db2',
+plot_button_3 = tk.Button(frame_aux3, text="Plotar Gráfico", command=plot_graph_third_order, bd=2, bg='#107db2',
                                       fg='white', font=('verdana', 8, 'bold'))
 plot_button_3.pack(pady=(10, 0))
 
 
 # Rótulo para mostrar o resultado final de y1
-result_label3 = tk.Label(frame_aux, text="")
+result_label3 = tk.Label(frame_aux3, text="")
 result_label3.pack(pady=(5,0))
 
 # Lista de valores
-result_frame3 = tk.Frame(frame_aux)
+result_frame3 = tk.Frame(frame_aux3)
 result_frame3.pack(pady=(5,0))
 
 result_text3 = tk.Text(result_frame3, wrap=tk.WORD, width=25, height=7.5)
 result_text3.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")  # Use grid
 
-scrollbar3 = tk.Scrollbar(result_frame3, command=result_text1.yview)
-scrollbar3.grid(row=0, column=1, sticky="ns")  # Use grid
+scrollbar3_2 = tk.Scrollbar(result_frame3, command=result_text3.yview)
+scrollbar3_2.grid(row=0, column=1, sticky="ns")  # Use grid
 
-result_text3.config(yscrollcommand=scrollbar3.set)
+result_text3.config(yscrollcommand=scrollbar3_2.set)
 
 # Quarta aba
 
-def on_configure(event):
+def on_configure4(event):
     canvas4.configure(scrollregion=canvas4.bbox("all"))
     
 # Criando aba
@@ -747,8 +789,8 @@ canvas4.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
 scrollbar4_1 = ttk.Scrollbar(tab4, orient=tk.VERTICAL, command=canvas4.yview)
 scrollbar4_1.pack(side=tk.RIGHT, fill=tk.Y)
 
-canvas4.configure(yscrollcommand=scroll.set )
-canvas4.bind('<Configure>',on_configure)
+canvas4.configure(yscrollcommand=scrollbar4_1.set )
+canvas4.bind('<Configure>',on_configure4)
 
 # Criando frame dentro do canvas
 frame_aux4 = tk.Frame(canvas4)
@@ -756,7 +798,7 @@ frame_aux4 = tk.Frame(canvas4)
 canvas4.create_window((0,0), window=frame_aux4, anchor = "nw" )
 
 # Valores pedidos ao usuario
-equation_label4 = tk.Label(frame_aux4, text="Digite a derivada de y (y'): ")
+equation_label4 = tk.Label(frame_aux4, text="Digite a quarta derivada de y (y''''): ")
 equation_label4.pack(pady=(10,0))
 
 equation_entry4 = tk.Entry(frame_aux4)
@@ -849,9 +891,3 @@ result_text4.config(yscrollcommand=scrollbar4_2.set)
 
 
 root.mainloop()
-
-
-# Imprimir os resultados
-#print("\nResultados:")
-#for i in range(len(x_values)):
-#    print(f"x = {x_values[i]:.2f}, y = {y_values[i]:.6f}, z = {z_values[i]:.6f}")
