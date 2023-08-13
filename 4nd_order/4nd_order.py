@@ -321,6 +321,88 @@ def runge_kutta_4th_order_edo_3th_order(f, x0, y0, y_prime0, y_double_prime0, h,
 
 # 4 ORDEM ###########
 
+def plot_graph_fourth_order():
+    x_values, y_values, _, _, _ = solve_edo4(equation_entry4.get())
+    plt.figure(figsize=(8, 6))
+    plt.plot(x_values, y_values, label="y(x)")
+    plt.xlabel("x")
+    plt.ylabel("y")
+    plt.title("Gráfico de y em função de x")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+def inciar_4nd_ordem_i():
+    p = int(p_entry4.get())
+    
+    x = Symbol('x')
+    y = Function('y')(x)
+    dydx = Function('dydxy')(x)
+    d2ydx2 = Function('d2ydx2')(x)
+    d3ydx3 = Function('d3ydx3')(x)
+
+    equation_str = equation_entry4.get()
+
+    eq1 = eval(equation_str)
+
+    x_v, y_v, z_v, w_v, j_v= solve_edo4(equation_str)
+    
+    y1 = y_v[p]
+
+    # Atualizar o rótulo com o valor de y1
+    result_label4.config(text=f"y1 = {y1:.6f}",  bd=2, bg = '#107db2', fg ='white'
+                            , font = ('verdana', 8, 'bold'))
+
+def inciar_4nd_ordem_l():
+    
+    p = int(p_entry4.get())
+    
+    x = Symbol('x')
+    y = Function('y')(x)
+    dydx = Function('dydxy')(x)
+    d2ydx2 = Function('d2ydx2')(x)
+    d3ydx3 = Function('d3ydx3')(x)
+
+    equation_str = equation_entry4.get()
+
+    eq1 = eval(equation_str)
+
+    x_v, y_v, z_v, w_v, j_v = solve_edo4(equation_str)
+    
+
+    text = ""
+    
+    for i in range(0, p+1):
+        text += f"[{i}] \ny1: {y_v[i]:.6f} \nz1: {z_v[i]:.6f}\nw1: {w_v[i]:.6f}\nj1: {j_v[i]:.6f}\n\n"
+    
+    result_text4.delete('1.0', tk.END)
+    result_text4.insert(tk.END, text)
+
+def solve_edo4(equation_str):
+
+    # Obter os valores informados pelo usuário
+    x0 = float(x0_entry4.get())
+    x_final = float(x0_final_entry4.get())
+    y0 = float(y0_entry4.get())
+    z0 = float(z0_entry4.get())
+    w0 = float(w0_entry4.get())
+    j0 = float(j0_entry4.get())
+    n = int(np_entry4.get())
+    h = (x_final - x0) / n
+    derivative_str = equation_str
+
+    # Definir a variável simbólica para x e y
+    x, y, dydx, d2ydx2, d3ydx3 = symbols('x y dydx d2ydx2 d3ydx3')
+
+    # Definir a função f(x, y) como a derivada de y (y')
+    derivative_expr = sympify(derivative_str)
+    f = lambdify((x, y, dydx, d2ydx2, d3ydx3), derivative_expr, modules=['numpy'])
+
+    # Resolvendo a equação usando o método de Runge-Kutta
+    x_values, y_values, z_values, w_values, j_values = runge_kutta_4th_order_edo_4th_order(f, x0, y0, z0, w0, j0, h, n)
+  
+    return x_values, y_values, z_values, w_values, j_values
+
 def runge_kutta_4th_order_edo_4th_order(f, x0, y0, y_prime0, y_double_prime0, y_triple_prime0, h, num_points):
     x_values = [x0]
     y_values = [y0]
@@ -662,7 +744,7 @@ canvas4 = tk.Canvas(tab4)
 canvas4.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
 
 # Criando Scroll
-scrollbar4_1 = ttk.Scrollbar(tab4, orient=tk.VERTICAL, command=canvas3.yview)
+scrollbar4_1 = ttk.Scrollbar(tab4, orient=tk.VERTICAL, command=canvas4.yview)
 scrollbar4_1.pack(side=tk.RIGHT, fill=tk.Y)
 
 canvas4.configure(yscrollcommand=scroll.set )
@@ -713,6 +795,12 @@ w0_label4.pack(pady=(5,0))
 w0_entry4 = tk.Entry(frame_aux4)
 w0_entry4.pack(pady=(5,0))
 
+j0_label4 = tk.Label(frame_aux4, text="Digite o valor inicial de j, y'''(x0): ")
+j0_label4.pack(pady=(5,0))
+
+j0_entry4 = tk.Entry(frame_aux4)
+j0_entry4.pack(pady=(5,0))
+
 n_label4 = tk.Label(frame_aux4, text="Digite a quantidade de pontos (np): ")
 n_label4.pack(pady=(5,0))
 
@@ -754,7 +842,7 @@ result_frame4.pack(pady=(5,0))
 result_text4 = tk.Text(result_frame4, wrap=tk.WORD, width=25, height=7.5)
 result_text4.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")  # Use grid
 
-scrollbar4_2 = tk.Scrollbar(result_frame4, command=result_text1.yview)
+scrollbar4_2 = tk.Scrollbar(result_frame4, command=result_text4.yview)
 scrollbar4_2.grid(row=0, column=1, sticky="ns")  # Use grid
 
 result_text4.config(yscrollcommand=scrollbar4_2.set)
