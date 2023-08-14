@@ -479,7 +479,7 @@ def iniciar_5nd_ordem_i():
     y1 = y_v[p]
 
     # Atualizar o rótulo com o valor de y1
-    result_label4.config(text=f"y1 = {y1:.6f}",  bd=2, bg = '#107db2', fg ='white'
+    result_label5.config(text=f"y1 = {y1:.6f}",  bd=2, bg = '#107db2', fg ='white'
                             , font = ('verdana', 8, 'bold'))
 
 def iniciar_5nd_ordem_l():
@@ -1132,7 +1132,7 @@ solve_button5_2 = tk.Button(frame_aux5, text="Listar y1, z1, w1, j1", command=in
 solve_button5_2.pack(pady=(10, 0))
 # Botão para plotar grafico 
 
-plot_button_5 = tk.Button(frame_aux5, text="Plotar Gráfico", command=plot_graph_fourth_order, bd=2, bg='#107db2',
+plot_button_5 = tk.Button(frame_aux5, text="Plotar Gráfico", command=plot_graph_fifth_order, bd=2, bg='#107db2',
                                       fg='white', font=('verdana', 8, 'bold'))
 plot_button_5.pack(pady=(10, 0))
 
