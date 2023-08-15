@@ -174,8 +174,7 @@ def runge_kutta_6th_order_edo_1th_order(f, x0, y0, x_max, n):
 # 2 ORDEM ############
 
 def plot_graph_second_order():
-    y_values, _ = solve_edo2(float(x0_inicial_entry2.get()), float(x0_final_entry2.get()),
-                             float(y0_entry2.get()), float(z0_entry2.get()), int(n_entry2.get()), int(p_entry2.get()))
+    x_values, y_values , _= solve_edo2(equation_entry2.get(), g)
 
     plt.figure(figsize=(8, 6))
     plt.plot(x_values, y_values, label="y(x)")
@@ -206,7 +205,7 @@ def iniciar_2nd_ordem_i(gb):
                             , font = ('verdana', 8, 'bold'))
 
 def iniciar_2nd_ordem_l(gb):  
-    p = int(p_entry3.get())
+    p = int(p_entry2.get())
     
     x = Symbol('x')
     y = Function('y')(x)
@@ -232,11 +231,11 @@ def solve_edo2(equation_str, gb):
     g = gb
 
     # Obter os valores informados pelo usuário
-    x0 = float(x0_entry1.get())
-    x_final = float(x0_final_entry1.get())
-    y0 = float(y0_entry1.get())
+    x0 = float(x0_entry2.get())
+    x_final = float(x0_final_entry2.get())
+    y0 = float(y0_entry2.get())
     z0 = float(z0_entry2.get())
-    n = int(np_entry1.get())
+    n = int(p_entry2.get())
     
     derivative_str = equation_str
 
@@ -253,48 +252,67 @@ def solve_edo2(equation_str, gb):
     elif gb == 6:
         x_values, y_values, z_values = runge_kutta_6th_order_edo_2th_order(f, x0, y0, z0, x_final, n)
     elif gb == 1:
-        x_values, y_values, z_values = solve_euler1(f, x0, y0, x_final, n)
+        x_values, y_values, z_values = solve_euler2(f, x0, y0, z0, x_final, n)
     elif gb == 2:
-        x_values, y_values, z_values = solve_heun1(f, x0, y0, x_final, n)
+        x_values, y_values, z_values = solve_heun2(f, x0, y0, z0, x_final, n)
 
     return x_values, y_values, z_values
 
-def solve_heun2(f, x0, y0, x_max, n):
+def solve_heun2(f, x0, y0, z0, x_max, n):
     step = (x_max-x0)/n
     
     x_values = [x0]
     y_values = [y0]
+    z_values = [z0]
 
     x = x0
     y = y0
+    z = z0
 
-    while x < x_max:
-        k1 = step * f(x, y)
-        k2 = step * f(x + step, y + k1)
-        y = y + 0.5 * (k1 + k2)
+    for _ in range(n):
+        k1 = step * z
+        l1 = step * f(x, y, z)
+
+        k2 = step * (z + 0.5 * l1)
+        l2 = step * f(x + 0.5 * step, y + 0.5 * k1, z + 0.5 * l1)
+
+        y_next = y + k2
+        yp_next = z + l2
+
         x = x + step
+        y = y_next
+        z = yp_next
+
         x_values.append(x)
         y_values.append(y)
+        z_values.append(z)
 
-    return x_values, y_values
+    return x_values, y_values, z_values
 
-def solve_euler2(f, x0, y0, x_max, n):
+def solve_euler2(f, x0, y0, z0, x_max, n):
     step = (x_max-x0)/n
     
     x_values = [x0]
     y_values = [y0]
-
+    z_values = [z0]
 
     x = x0
     y = y0
+    yp = z0
 
-    while x < x_max:
-        y = y + step * f(x, y)
+    for _ in range(n):
+        y_next = y + step * yp
+        yp_next = yp + step * f(x, y, yp)
+
         x = x + step
+        y = y_next
+        z = yp_next
+
         x_values.append(x)
         y_values.append(y)
+        z_values.append(z)
 
-    return x_values, y_values
+    return x_values, y_values, z_values
 
 def runge_kutta_4th_order_edo_2th_order(f, x0, y0, y_prime0, x_max, n):
 
@@ -372,7 +390,7 @@ def runge_kutta_6th_order_edo_2th_order(f, x0, y0, y_prime0, x_max, n):
 # 3 ORDEM ############
 
 def plot_graph_third_order():
-    x_values, y_values, _, _ = solve_edo3(equation_entry3.get())
+    x_values, y_values, _, _ = solve_edo3(equation_entry3.get(), gb)
     plt.figure(figsize=(8, 6))
     plt.plot(x_values, y_values, label="y(x)")
     plt.xlabel("x")
@@ -453,48 +471,79 @@ def solve_edo3(equation_str, gb):
     elif gb == 6:
         x_values, y_values, z_values, w_values = runge_kutta_6th_order_edo_3th_order(f, x0, y0, z0, w0, x_final, n)
     elif gb == 1:
-        x_values, y_values, z_values, w_values = solve_euler1(f, x0, y0, x_final, n)
+        x_values, y_values, z_values, w_values = solve_euler3(f, x0, y0, z0, w0, x_final, n)
     elif gb == 2:
-        x_values, y_values, z_values, w_values = solve_heun1(f, x0, y0, x_final, n)
+        x_values, y_values, z_values, w_values = solve_heun3(f, x0, y0, z0, w0, x_final, n)
 
     return x_values, y_values, z_values, w_values
 
-def solve_heun3(f, x0, y0, x_max, n):
-    step = (x_max-x0)/n
+def solve_heun3(f, x0, y0, z0, w0, x_max, n):
+    step = (x_max - x0) / n
     
     x_values = [x0]
     y_values = [y0]
+    z_values = [z0]
+    w_values = [w0]
 
     x = x0
     y = y0
+    z = z0
+    w = w0
 
-    while x < x_max:
-        k1 = step * f(x, y)
-        k2 = step * f(x + step, y + k1)
-        y = y + 0.5 * (k1 + k2)
+    for _ in range(n):
+        k1 = step * z
+        l1 = step * w
+        m1 = step * f(x, y, z, w)
+
+        k2 = step * (z + 0.5 * l1)
+        l2 = step * (w + 0.5 * m1)
+        m2 = step * f(x + 0.5 * step, y + 0.5 * k1, z + 0.5 * l1, w + 0.5 * m1)
+
+        y_next = y + k2
+        z_next = z + l2
+        w_next = w + m2
+
         x = x + step
+        y = y_next
+        z = z_next
+        w = w_next
+
         x_values.append(x)
         y_values.append(y)
+        z_values.append(z)
+        w_values.append(w)
 
-    return x_values, y_values
+    return x_values, y_values, z_values, w_values
 
-def solve_euler3(f, x0, y0, x_max, n):
-    step = (x_max-x0)/n
+def solve_euler3(f, x0, y0, z0, w0, x_max, n):
+    step = (x_max - x0) / n
     
     x_values = [x0]
     y_values = [y0]
-
+    z_values = [z0]
+    w_values = [w0]
 
     x = x0
     y = y0
+    z = z0
+    w = w0
 
-    while x < x_max:
-        y = y + step * f(x, y)
+    for _ in range(n):
+        y_next = y + step * z
+        z_next = z + step * w
+        w_next = w + step * f(x, y, z, w)
+
         x = x + step
+        y = y_next
+        z = z_next
+        w = w_next
+
         x_values.append(x)
         y_values.append(y)
+        z_values.append(z)
+        w_values.append(w)
 
-    return x_values, y_values
+    return x_values, y_values, z_values, w_values
 
 def runge_kutta_4th_order_edo_3th_order(f, x0, y0, y_prime0, y_double_prime0, x_max, n):
     h = (x_max - x0) / n
@@ -586,7 +635,7 @@ def runge_kutta_6th_order_edo_3th_order(f, x0, y0, y_prime0, y_double_prime0, x_
 # 4 ORDEM ###########
 
 def plot_graph_fourth_order():
-    x_values, y_values, _, _, _ = solve_edo4(equation_entry4.get())
+    x_values, y_values, _, _, _ = solve_edo4(equation_entry4.get(), gb)
     plt.figure(figsize=(8, 6))
     plt.plot(x_values, y_values, label="y(x)")
     plt.xlabel("x")
@@ -801,7 +850,7 @@ def runge_kutta_6th_order_edo_4th_order(f, x0, y0, y_prime0, y_double_prime0, y_
 # 5 ORDEM ###########
 
 def plot_graph_fifth_order():
-    x_values, y_values, _, _, _, _ = solve_edo5(equation_entry5.get())
+    x_values, y_values, _, _, _, _ = solve_edo5(equation_entry5.get(), gb)
     plt.figure(figsize=(8, 6))
     plt.plot(x_values, y_values, label="y(x)")
     plt.xlabel("x")
@@ -1198,8 +1247,8 @@ equation_entry2.pack()
 x0_inicial_label2 = tk.Label(frame_aux2, text="Digite o valor inicial de x, (x0): ")
 x0_inicial_label2.pack()
 
-x0_inicial_entry2 = tk.Entry(frame_aux2)
-x0_inicial_entry2.pack()
+x0_entry2 = tk.Entry(frame_aux2)
+x0_entry2.pack()
 
 x0_final_label2 = tk.Label(frame_aux2, text="Digite o valor final de x, (xf): ")
 x0_final_label2.pack()
