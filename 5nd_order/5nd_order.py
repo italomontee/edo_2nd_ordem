@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 # 1 ORDEM ############
 
 def plot_graph_first_order():
-    x_values, y_values = solve_edo1(equation_entry1.get())
+    x_values, y_values = solve_edo1(equation_entry1.get(), g)
     plt.figure(figsize=(8, 6))
     plt.plot(x_values, y_values, label="y(x)")
     plt.xlabel("x")
@@ -18,7 +18,7 @@ def plot_graph_first_order():
     plt.grid(True)
     plt.show()
 
-def iniciar_1nd_ordem_i():
+def iniciar_1nd_ordem_i(gb):
     p = int(p_entry1.get())
     
     x = Symbol('x')
@@ -28,7 +28,7 @@ def iniciar_1nd_ordem_i():
 
     eq1 = eval(equation_str)
 
-    x_v, y_v = solve_edo1(equation_str)
+    x_v, y_v = solve_edo1(equation_str, gb)
     
     y1 = y_v[p]
 
@@ -36,7 +36,7 @@ def iniciar_1nd_ordem_i():
     result_label1.config(text=f"y1 = {y1:.6f}",  bd=2, bg = '#107db2', fg ='white'
                             , font = ('verdana', 8, 'bold'))
 
-def iniciar_1nd_ordem_l():
+def iniciar_1nd_ordem_l(gb):
     p = int(p_entry1.get())
 
     x = Symbol('x')
@@ -46,7 +46,7 @@ def iniciar_1nd_ordem_l():
 
     eq1 = eval(equation_str)
 
-    x_v, y_v = solve_edo1(equation_str)
+    x_v, y_v = solve_edo1(equation_str, gb)
 
     text = ""
     
@@ -56,7 +56,10 @@ def iniciar_1nd_ordem_l():
     result_text1.delete('1.0', tk.END)
     result_text1.insert(tk.END, text)
     
-def solve_edo1(equation_str):
+def solve_edo1(equation_str, gb):
+    global g
+    g = gb
+
     # Obter os valores informados pelo usuário
     x0 = float(x0_entry1.get())
     x_final = float(x0_final_entry1.get())
@@ -73,9 +76,52 @@ def solve_edo1(equation_str):
     f = lambdify((x, y), derivative_expr, modules=['numpy'])
 
     # Resolvendo a equação usando o método de Runge-Kutta
-    x_values, y_values = runge_kutta_4th_order_edo_1th_order(f, x0, y0, x_final, n)
+    if gb == 4:
+        x_values, y_values = runge_kutta_4th_order_edo_1th_order(f, x0, y0, x_final, n)
+    elif gb == 6:
+        x_values, y_values = runge_kutta_6th_order_edo_1th_order(f, x0, y0, x_final, n)
+    elif gb == 1:
+        x_values, y_values = solve_euler1(f, x0, y0, x_final, n)
+    elif gb == 2:
+        x_values, y_values = solve_heun1(f, x0, y0, x_final, n)
 
+    return x_values, y_values
+
+def solve_heun1(f, x0, y0, x_max, n):
+    step = (x_max-x0)/n
     
+    x_values = [x0]
+    y_values = [y0]
+
+    x = x0
+    y = y0
+
+    while x < x_max:
+        k1 = step * f(x, y)
+        k2 = step * f(x + step, y + k1)
+        y = y + 0.5 * (k1 + k2)
+        x = x + step
+        x_values.append(x)
+        y_values.append(y)
+
+    return x_values, y_values
+
+def solve_euler1(f, x0, y0, x_max, n):
+    step = (x_max-x0)/n
+    
+    x_values = [x0]
+    y_values = [y0]
+
+
+    x = x0
+    y = y0
+
+    while x < x_max:
+        y = y + step * f(x, y)
+        x = x + step
+        x_values.append(x)
+        y_values.append(y)
+
     return x_values, y_values
 
 def runge_kutta_4th_order_edo_1th_order(f, x0, y0, x_max, n):
@@ -102,6 +148,29 @@ def runge_kutta_4th_order_edo_1th_order(f, x0, y0, x_max, n):
 
     return x_values, y_values
 
+def runge_kutta_6th_order_edo_1th_order(f, x0, y0, x_max, n):
+    h = (x_max - x0) / n
+    x_values = np.linspace(x0, x_max, n+1)
+    y_values = np.zeros(n+1)
+
+    x_values[0] = x0
+    y_values[0] = y0
+
+    for i in range(1, n+1):
+        x = x_values[i - 1]
+        y = y_values[i - 1]
+        
+        k1 = h * f(x, y)
+        k2 = h * f(x + h/3, y + k1/3)
+        k3 = h * f(x + 2*h/3, y + 2*k2/3)
+        k4 = h * f(x + h, y + (k1 + 3*k2 + 3*k3) / 8)
+        k5 = h * f(x + h/2, y + (k1 - 3*k2 + 4*k3 + 8*k4) / 16)
+        k6 = h * f(x + h, y + (k1 + 4*k2 + k3 - 8*k4 + 2*k5) / 16)
+        
+        y_values[i] = y + (k1 + 4*k3 + k5 + 6*k6) / 15
+
+    return x_values, y_values
+
 # 2 ORDEM ############
 
 def plot_graph_second_order():
@@ -117,50 +186,38 @@ def plot_graph_second_order():
     plt.grid(True)
     plt.show()
 
-def iniciar_2nd_ordem_i():
-    global x_sym, y_sym, dydx_sym, equation
-
+def iniciar_2nd_ordem_i(gb):
+   
     # Solicitar informações do usuário
     p = int(p_entry2.get())
-    x0 = float(x0_inicial_entry2.get())
-    x_final = float(x0_final_entry2.get())
-    y0 = float(y0_entry2.get())
-    z0 = float(z0_entry2.get())
-    n = int(n_entry2.get())
 
     #Definir simbolos
-    x_sym = Symbol('x')
-    y_sym = Function('y')(x_sym)
-    dydx_sym = Function('dydx')(x_sym)
+    x = Symbol('x')
+    y = Function('y')(x)
+    dydx = Function('dydxy')(x)
 
-    equation = equation_entry2.get()
-    equation = sympify(equation)
+    equation_str = equation_entry2.get()
 
-    y_v, z_v = solve_edo2(x0, x_final, y0, z0, n, p)
+    eq1 = eval(equation_str)
+
+    x_v, y_v, z_v = solve_edo2(equation_str, gb)
 
     result_label2.config(text=f"y1 = {y_v[p]:.6f}, z1 = {z_v[p]:.6f}",  bd=2, bg = '#107db2', fg ='white'
                             , font = ('verdana', 8, 'bold'))
 
-def iniciar_2nd_ordem_l():
-    global x_sym, y_sym, dydx_sym, equation
+def iniciar_2nd_ordem_l(gb):  
+    p = int(p_entry3.get())
+    
+    x = Symbol('x')
+    y = Function('y')(x)
+    dydx = Function('dydxy')(x)
 
-    # Solicitar informações do usuário
-    p = int(p_entry2.get())
-    x0 = float(x0_inicial_entry2.get())
-    x_final = float(x0_final_entry2.get())
-    y0 = float(y0_entry2.get())
-    z0 = float(z0_entry2.get())
-    n = int(n_entry2.get())
+    equation_str = equation_entry2.get()
 
-    #Definir simbolos
-    x_sym = Symbol('x')
-    y_sym = Function('y')(x_sym)
-    dydx_sym = Function('dydx')(x_sym)
+    eq1 = eval(equation_str)
 
-    equation = equation_entry2.get()
-    equation = sympify(equation)
-
-    y_v, z_v = solve_edo2(x0, x_final, y0, z0, n, p)
+    x_v, y_v, z_v = solve_edo2(equation_str, gb)
+    
 
     text = ""
     
@@ -170,35 +227,110 @@ def iniciar_2nd_ordem_l():
     result_text2.delete('1.0', tk.END)
     result_text2.insert(tk.END, text)                  
 
-def system_of_odes2(x, y_z):
-    y, z = y_z
-    dydx = z
-    dzdx = eval(str(lambdify((x_sym, y_sym, dydx_sym), equation)(x, y, dydx)))
-    return [dydx, dzdx]
+def solve_edo2(equation_str, gb):
+    global g
+    g = gb
 
-def solve_edo2(x0, x_final, y0, z0, n, p):
+    # Obter os valores informados pelo usuário
+    x0 = float(x0_entry1.get())
+    x_final = float(x0_final_entry1.get())
+    y0 = float(y0_entry1.get())
+    z0 = float(z0_entry2.get())
+    n = int(np_entry1.get())
+    
+    derivative_str = equation_str
 
-    global x_values
-    global y_values
-    global z_values
+    # Definir a variável simbólica para x e y
+    x, y , dydx= symbols('x y dydx')
 
-    # Definir o intervalo de integração
-    x_span = (x0, x_final)
+    # Definir a função f(x, y) como a derivada de y (y')
+    derivative_expr = sympify(derivative_str)
+    f = lambdify((x, y, dydx), derivative_expr, modules=['numpy'])
 
-    # Definir as condições iniciais
-    initial_conditions = [y0, z0]
+    # Resolvendo a equação usando o método de Runge-Kutta
+    if gb == 4:
+        x_values, y_values, z_values = runge_kutta_4th_order_edo_2th_order(f, x0, y0, z0, x_final, n)
+    elif gb == 6:
+        x_values, y_values, z_values = runge_kutta_6th_order_edo_2th_order(f, x0, y0, z0, x_final, n)
+    elif gb == 1:
+        x_values, y_values, z_values = solve_euler1(f, x0, y0, x_final, n)
+    elif gb == 2:
+        x_values, y_values, z_values = solve_heun1(f, x0, y0, x_final, n)
 
-    # Resolver o sistema usando o método de Runge-Kutta de 4ª ordem
-    solution = solve_ivp(system_of_odes2, x_span, initial_conditions, method='RK45', t_eval=np.linspace(x0, x_final, n+1))
+    return x_values, y_values, z_values
 
-    # Obter os resultados
-    x_values = solution.t
-    y_values, z_values = solution.y
+def runge_kutta_4th_order_edo_2th_order(f, x0, y0, y_prime0, x_max, n):
 
-    return y_values, z_values
+    h = (x_max - x0) / n
+    x_values = np.linspace(x0, x_max, n + 1)
+    y1_values = np.zeros(n + 1)
+    y2_values = np.zeros(n + 1)
 
-    #result_label2.config(text=f"y1 = {y_values[p]:.6f}, z1 = {z_values[p]:.6f}",  bd=2, bg = '#107db2', fg ='white'
-    #                        , font = ('verdana', 8, 'bold'))
+    x = x0
+    y1 = y0
+    y2 = y_prime0  
+
+    for i in range(1, n + 1):
+        k1_y1 = h * y2
+        k1_y2 = h * f(x, y1, y2)
+
+        k2_y1 = h * (y2 + 0.5 * k1_y2)
+        k2_y2 = h * f(x + 0.5 * h, y1 + 0.5 * k1_y1, y2 + 0.5 * k1_y2)
+
+        k3_y1 = h * (y2 + 0.5 * k2_y2)
+        k3_y2 = h * f(x + 0.5 * h, y1 + 0.5 * k2_y1, y2 + 0.5 * k2_y2)
+
+        k4_y1 = h * (y2 + k3_y2)
+        k4_y2 = h * f(x + h, y1 + k3_y1, y2 + k3_y2)
+
+        y1 = y1 + (k1_y1 + 2 * k2_y1 + 2 * k3_y1 + k4_y1) / 6
+        y2 = y2 + (k1_y2 + 2 * k2_y2 + 2 * k3_y2 + k4_y2) / 6
+
+        x = x + h
+        x_values[i] = x
+        y1_values[i] = y1
+        y2_values[i] = y2
+
+    return x_values, y1_values, y2_values
+
+def runge_kutta_6th_order_edo_2th_order(f, x0, y0, y_prime0, x_max, n):
+    h = (x_max - x0) / n
+    x_values = np.linspace(x0, x_max, n + 1)
+    y1_values = np.zeros(n + 1)
+    y2_values = np.zeros(n + 1)
+
+    x = x0
+    y1 = y0
+    y2 = y_prime0
+
+    for i in range(1, n + 1):
+        k1_y1 = h * y2
+        k1_y2 = h * f(x, y1, y2)
+
+        k2_y1 = h * (y2 + k1_y2 / 3)
+        k2_y2 = h * f(x + h / 3, y1 + k1_y1 / 3, y2 + k1_y2 / 3)
+
+        k3_y1 = h * (y2 + 2 * k2_y2 / 3)
+        k3_y2 = h * f(x + 2 * h / 3, y1 + 2 * k2_y1 / 3, y2 + 2 * k2_y2 / 3)
+
+        k4_y1 = h * (y2 + k1_y2)
+        k4_y2 = h * f(x + h, y1 + k1_y1, y2 + k1_y2)
+
+        k5_y1 = h * (y2 + (k1_y2 + 4 * k2_y2 + k4_y2) / 6)
+        k5_y2 = h * f(x + h / 2, y1 + (k1_y1 + 4 * k2_y1 + k4_y1) / 6, y2 + (k1_y2 + 4 * k2_y2 + k4_y2) / 6)
+
+        k6_y1 = h * (y2 + (k1_y2 + 3 * k3_y2 + 4 * k4_y2 + k5_y2) / 8)
+        k6_y2 = h * f(x + h, y1 + (k1_y1 + 3 * k3_y1 + 4 * k4_y1 + k5_y1) / 8, y2 + (k1_y2 + 3 * k3_y2 + 4 * k4_y2 + k5_y2) / 8)
+
+        y1 = y1 + (k1_y1 + 3 * k3_y1 + 4 * k4_y1 + k5_y1 + 3 * k6_y1) / 15
+        y2 = y2 + (k1_y2 + 3 * k3_y2 + 4 * k4_y2 + k5_y2 + 3 * k6_y2) / 15
+
+        x = x + h
+        x_values[i] = x
+        y1_values[i] = y1
+        y2_values[i] = y2
+
+    return x_values, y1_values, y2_values
 
 # 3 ORDEM ############
 
@@ -213,7 +345,7 @@ def plot_graph_third_order():
     plt.grid(True)
     plt.show()
 
-def iniciar_3nd_ordem_i():
+def iniciar_3nd_ordem_i(gb):
     
     p = int(p_entry3.get())
     
@@ -226,7 +358,7 @@ def iniciar_3nd_ordem_i():
 
     eq1 = eval(equation_str)
 
-    x_v, y_v, z_v, w_v= solve_edo3(equation_str)
+    x_v, y_v, z_v, w_v= solve_edo3(equation_str, gb)
     
     y1 = y_v[p]
 
@@ -234,7 +366,7 @@ def iniciar_3nd_ordem_i():
     result_label3.config(text=f"y1 = {y1:.6f}",  bd=2, bg = '#107db2', fg ='white'
                             , font = ('verdana', 8, 'bold'))
 
-def iniciar_3nd_ordem_l():
+def iniciar_3nd_ordem_l(gb):
     
     p = int(p_entry3.get())
     
@@ -247,7 +379,7 @@ def iniciar_3nd_ordem_l():
 
     eq1 = eval(equation_str)
 
-    x_v, y_v, z_v, w_v= solve_edo3(equation_str)
+    x_v, y_v, z_v, w_v= solve_edo3(equation_str, gb)
     
 
     text = ""
@@ -258,8 +390,9 @@ def iniciar_3nd_ordem_l():
     result_text3.delete('1.0', tk.END)
     result_text3.insert(tk.END, text)
 
-def solve_edo3(equation_str):
-
+def solve_edo3(equation_str, gb):
+    global g
+    g = gb
     # Obter os valores informados pelo usuário
     x0 = float(x0_entry3.get())
     x_final = float(x0_final_entry3.get())
@@ -278,11 +411,19 @@ def solve_edo3(equation_str):
     f = lambdify((x, y, dydx, d2ydx2), derivative_expr, modules=['numpy'])
 
     # Resolvendo a equação usando o método de Runge-Kutta
-    x_values, y_values, z_values, w_values = runge_kutta_4th_order_edo_3th_order(f, x0, y0, z0, w0, h, n)
-  
+    if gb == 4:
+        x_values, y_values, z_values, w_values = runge_kutta_4th_order_edo_3th_order(f, x0, y0, z0, w0, x_final, n)
+    elif gb == 6:
+        x_values, y_values, z_values, w_values = runge_kutta_6th_order_edo_3th_order(f, x0, y0, z0, w0, x_final, n)
+    elif gb == 1:
+        x_values, y_values, z_values, w_values = solve_euler1(f, x0, y0, x_final, n)
+    elif gb == 2:
+        x_values, y_values, z_values, w_values = solve_heun1(f, x0, y0, x_final, n)
+
     return x_values, y_values, z_values, w_values
 
-def runge_kutta_4th_order_edo_3th_order(f, x0, y0, y_prime0, y_double_prime0, h, num_points):
+def runge_kutta_4th_order_edo_3th_order(f, x0, y0, y_prime0, y_double_prime0, x_max, n):
+    h = (x_max - x0) / n
      # Inicializar listas para armazenar os resultados
     x_values = [x0]
     y_values = [y0]
@@ -290,7 +431,7 @@ def runge_kutta_4th_order_edo_3th_order(f, x0, y0, y_prime0, y_double_prime0, h,
     y_double_prime_values = [y_double_prime0]
 
     # Implementação do método de Runge-Kutta de quarta ordem
-    for _ in range(num_points):
+    for _ in range(1, n+1):
         x = x_values[-1]
         y = y_values[-1]
         y_prime = y_prime_values[-1]
@@ -319,6 +460,55 @@ def runge_kutta_4th_order_edo_3th_order(f, x0, y0, y_prime0, y_double_prime0, h,
 
     return x_values, y_values, y_prime_values, y_double_prime_values
 
+def runge_kutta_6th_order_edo_3th_order(f, x0, y0, y_prime0, y_double_prime0, x_max, n):
+    h = (x_max - x0) / n
+    x_values = np.linspace(x0, x_max, n + 1)
+    y1_values = np.zeros(n + 1)
+    y2_values = np.zeros(n + 1)
+    y3_values = np.zeros(n + 1)
+
+    x = x0
+    y1 = y0
+    y2 = y_prime0 
+    y3 = y_double_prime0 
+
+    for i in range(1, n + 1):
+        k1_y1 = h * y2
+        k1_y2 = h * y3
+        k1_y3 = h * f(x, y1, y2, y3)
+
+        k2_y1 = h * (y2 + k1_y2 / 3)
+        k2_y2 = h * (y3 + k1_y3 / 3)
+        k2_y3 = h * f(x + h / 3, y1 + k1_y1 / 3, y2 + k1_y2 / 3, y3 + k1_y3 / 3)
+
+        k3_y1 = h * (y2 + 2 * k2_y2 / 3)
+        k3_y2 = h * (y3 + 2 * k2_y3 / 3)
+        k3_y3 = h * f(x + 2 * h / 3, y1 + 2 * k2_y1 / 3, y2 + 2 * k2_y2 / 3, y3 + 2 * k2_y3 / 3)
+
+        k4_y1 = h * (y2 + k1_y2)
+        k4_y2 = h * (y3 + k1_y3)
+        k4_y3 = h * f(x + h, y1 + k1_y1, y2 + k1_y2, y3 + k1_y3)
+
+        k5_y1 = h * (y2 + (k1_y2 + 4 * k2_y2 + k4_y2) / 6)
+        k5_y2 = h * (y3 + (k1_y3 + 4 * k2_y3 + k4_y3) / 6)
+        k5_y3 = h * f(x + h / 2, y1 + (k1_y1 + 4 * k2_y1 + k4_y1) / 6, y2 + (k1_y2 + 4 * k2_y2 + k4_y2) / 6, y3 + (k1_y3 + 4 * k2_y3 + k4_y3) / 6)
+
+        k6_y1 = h * (y2 + (k1_y2 + 3 * k3_y2 + 4 * k4_y2 + k5_y2) / 8)
+        k6_y2 = h * (y3 + (k1_y3 + 3 * k3_y3 + 4 * k4_y3 + k5_y3) / 8)
+        k6_y3 = h * f(x + h, y1 + (k1_y1 + 3 * k3_y1 + 4 * k4_y1 + k5_y1) / 8, y2 + (k1_y2 + 3 * k3_y2 + 4 * k4_y2 + k5_y2) / 8, y3 + (k1_y3 + 3 * k3_y3 + 4 * k4_y3 + k5_y3) / 8)
+
+        y1 = y1 + (k1_y1 + 3 * k3_y1 + 4 * k4_y1 + k5_y1 + 3 * k6_y1) / 15
+        y2 = y2 + (k1_y2 + 3 * k3_y2 + 4 * k4_y2 + k5_y2 + 3 * k6_y2) / 15
+        y3 = y3 + (k1_y3 + 3 * k3_y3 + 4 * k4_y3 + k5_y3 + 3 * k6_y3) / 15
+
+        x = x + h
+        x_values[i] = x
+        y1_values[i] = y1
+        y2_values[i] = y2
+        y3_values[i] = y3
+
+    return x_values, y1_values, y2_values, y3_values
+
 # 4 ORDEM ###########
 
 def plot_graph_fourth_order():
@@ -332,7 +522,7 @@ def plot_graph_fourth_order():
     plt.grid(True)
     plt.show()
 
-def iniciar_4nd_ordem_i():
+def iniciar_4nd_ordem_i(gb):
     p = int(p_entry4.get())
     
     x = Symbol('x')
@@ -345,7 +535,7 @@ def iniciar_4nd_ordem_i():
 
     eq1 = eval(equation_str)
 
-    x_v, y_v, z_v, w_v, j_v= solve_edo4(equation_str)
+    x_v, y_v, z_v, w_v, j_v= solve_edo4(equation_str, gb)
     
     y1 = y_v[p]
 
@@ -353,7 +543,7 @@ def iniciar_4nd_ordem_i():
     result_label4.config(text=f"y1 = {y1:.6f}",  bd=2, bg = '#107db2', fg ='white'
                             , font = ('verdana', 8, 'bold'))
 
-def iniciar_4nd_ordem_l():
+def iniciar_4nd_ordem_l(gb):
     
     p = int(p_entry4.get())
     
@@ -367,7 +557,7 @@ def iniciar_4nd_ordem_l():
 
     eq1 = eval(equation_str)
 
-    x_v, y_v, z_v, w_v, j_v = solve_edo4(equation_str)
+    x_v, y_v, z_v, w_v, j_v = solve_edo4(equation_str, gb)
     
 
     text = ""
@@ -378,8 +568,9 @@ def iniciar_4nd_ordem_l():
     result_text4.delete('1.0', tk.END)
     result_text4.insert(tk.END, text)
 
-def solve_edo4(equation_str):
-
+def solve_edo4(equation_str, gb):
+    global g
+    g = gb
     # Obter os valores informados pelo usuário
     x0 = float(x0_entry4.get())
     x_final = float(x0_final_entry4.get())
@@ -399,11 +590,20 @@ def solve_edo4(equation_str):
     f = lambdify((x, y, dydx, d2ydx2, d3ydx3), derivative_expr, modules=['numpy'])
 
     # Resolvendo a equação usando o método de Runge-Kutta
-    x_values, y_values, z_values, w_values, j_values = runge_kutta_4th_order_edo_4th_order(f, x0, y0, z0, w0, j0, h, n)
-  
+    # Resolvendo a equação usando o método de Runge-Kutta
+    if gb == 4:
+        x_values, y_values, z_values, w_values, j_values = runge_kutta_4th_order_edo_4th_order(f, x0, y0, z0, w0, j0, x_final, n)
+    elif gb == 6:
+        x_values, y_values, z_values, w_values, j_values = runge_kutta_6th_order_edo_4th_order(f, x0, y0, z0, w0, j0, x_final, n)
+    elif gb == 1:
+        x_values, y_values, z_values, w_values, j_values = solve_euler1(f, x0, y0, x_final, n)
+    elif gb == 2:
+        x_values, y_values, z_values, w_values, j_values = solve_heun1(f, x0, y0, x_final, n)
+
     return x_values, y_values, z_values, w_values, j_values
 
-def runge_kutta_4th_order_edo_4th_order(f, x0, y0, y_prime0, y_double_prime0, y_triple_prime0, h, num_points):
+def runge_kutta_4th_order_edo_4th_order(f, x0, y0, y_prime0, y_double_prime0, y_triple_prime0, x_max, n ):
+    h = (x_max - x0) / n
     x_values = [x0]
     y_values = [y0]
     y_prime_values = [y_prime0]
@@ -411,7 +611,7 @@ def runge_kutta_4th_order_edo_4th_order(f, x0, y0, y_prime0, y_double_prime0, y_
     y_triple_prime_values = [y_triple_prime0]
 
     # Implementação do método de Runge-Kutta de quarta ordem
-    for _ in range(num_points):
+    for _ in range(1, n+1):
         x = x_values[-1]
         y = y_values[-1]
         y_prime = y_prime_values[-1]
@@ -446,6 +646,46 @@ def runge_kutta_4th_order_edo_4th_order(f, x0, y0, y_prime0, y_double_prime0, y_
 
     return x_values, y_values, y_prime_values, y_double_prime_values, y_triple_prime_values
 
+def runge_kutta_6th_order_edo_4th_order(f, x0, y0, y_prime0, y_double_prime0, y_triple_prime0, x_max, n):
+    h = (x_max - x0) / n
+    x_values = np.linspace(x0, x_max, n + 1)
+    y1_values = np.zeros(n + 1)
+    y2_values = np.zeros(n + 1)
+    y3_values = np.zeros(n + 1)
+    y4_values = np.zeros(n + 1)
+
+    x = x0
+    y1 = y0
+    y2 = y_prime0  # Inicialmente, a segunda derivada é desconhecida
+    y3 = y_double_prime0  # Inicialmente, a terceira derivada é desconhecida
+    y4 = 0  # Inicialmente, a quarta derivada é desconhecida
+
+    for i in range(1, n + 1):
+        k1_y1 = h * y2
+        k1_y2 = h * y3
+        k1_y3 = h * y4
+        k1_y4 = h * f(x, y1, y2, y3, y4)
+
+        k2_y1 = h * (y2 + k1_y2 / 3)
+        k2_y2 = h * (y3 + k1_y3 / 3)
+        k2_y3 = h * (y4 + k1_y4 / 3)
+        k2_y4 = h * f(x + h / 3, y1 + k1_y1 / 3, y2 + k1_y2 / 3, y3 + k1_y3 / 3, y4 + k1_y4 / 3)
+
+        # ... (continuar com os k3, k4, k5 e k6)
+
+        y1 = y1 + (k1_y1 + 3 * k3_y1 + 4 * k4_y1 + k5_y1 + 3 * k6_y1) / 15
+        y2 = y2 + (k1_y2 + 3 * k3_y2 + 4 * k4_y2 + k5_y2 + 3 * k6_y2) / 15
+        y3 = y3 + (k1_y3 + 3 * k3_y3 + 4 * k4_y3 + k5_y3 + 3 * k6_y3) / 15
+        y4 = y4 + (k1_y4 + 3 * k3_y4 + 4 * k4_y4 + k5_y4 + 3 * k6_y4) / 15
+
+        x = x + h
+        x_values[i] = x
+        y1_values[i] = y1
+        y2_values[i] = y2
+        y3_values[i] = y3
+        y4_values[i] = y4
+
+    return x_values, y1_values, y2_values, y3_values, y4_values
 
 # 5 ORDEM ###########
 
@@ -460,7 +700,7 @@ def plot_graph_fifth_order():
     plt.grid(True)
     plt.show()
 
-def iniciar_5nd_ordem_i():
+def iniciar_5nd_ordem_i(gb):
     p = int(p_entry5.get())
     
     x = Symbol('x')
@@ -474,7 +714,7 @@ def iniciar_5nd_ordem_i():
 
     eq1 = eval(equation_str)
 
-    x_v, y_v, z_v, w_v, j_v, c_v= solve_edo5(equation_str)
+    x_v, y_v, z_v, w_v, j_v, c_v= solve_edo5(equation_str, gb)
     
     y1 = y_v[p]
 
@@ -482,7 +722,7 @@ def iniciar_5nd_ordem_i():
     result_label5.config(text=f"y1 = {y1:.6f}",  bd=2, bg = '#107db2', fg ='white'
                             , font = ('verdana', 8, 'bold'))
 
-def iniciar_5nd_ordem_l():
+def iniciar_5nd_ordem_l(bg):
     
     p = int(p_entry5.get())
     
@@ -497,7 +737,7 @@ def iniciar_5nd_ordem_l():
 
     eq1 = eval(equation_str)
 
-    x_v, y_v, z_v, w_v, j_v, c_v = solve_edo5(equation_str)
+    x_v, y_v, z_v, w_v, j_v, c_v = solve_edo5(equation_str, gb)
     
 
     text = ""
@@ -508,8 +748,9 @@ def iniciar_5nd_ordem_l():
     result_text5.delete('1.0', tk.END)
     result_text5.insert(tk.END, text)
 
-def solve_edo5(equation_str):
-
+def solve_edo5(equation_str, gb):
+    global g
+    g = gb
     # Obter os valores informados pelo usuário
     x0 = float(x0_entry5.get())
     x_final = float(x0_final_entry5.get())
@@ -529,12 +770,20 @@ def solve_edo5(equation_str):
     derivative_expr = sympify(derivative_str)
     f = lambdify((x, y, dydx, d2ydx2, d3ydx3, d4ydx4), derivative_expr, modules=['numpy'])
 
-    # Resolvendo a equação usando o método de Runge-Kutta
-    x_values, y_values, z_values, w_values, j_values, c_values = runge_kutta_4th_order_edo_5th_order(f, x0, y0, z0, w0, j0, c0, h, n)
-  
+    if gb == 4:
+        x_values, y_values, z_values, w_values, j_values, c_values = runge_kutta_4th_order_edo_5th_order(f, x0, y0, z0, w0, j0, c0, x_final, n)
+    elif gb == 6:
+        x_values, y_values, z_values, w_values, j_values, c_values = runge_kutta_6th_order_edo_5th_order(f, x0, y0, z0, w0, j0, c0, x_final, n)
+    elif gb == 1:
+        x_values, y_values, z_values, w_values, j_values, c_values = solve_euler1(f, x0, y0, x_final, n)
+    elif gb == 2:
+        x_values, y_values, z_values, w_values, j_value, c_valuess = solve_heun1(f, x0, y0, x_final, n)
+
     return x_values, y_values, z_values, w_values, j_values, c_values
 
-def runge_kutta_4th_order_edo_5th_order(f, x0, y0, y_prime0, y_double_prime0, y_triple_prime0, y_quadruple_prime0, h, num_points):
+def runge_kutta_4th_order_edo_5th_order(f, x0, y0, y_prime0, y_double_prime0, y_triple_prime0, y_quadruple_prime0, x_max, n):
+    h = (x_max - x0) / n
+    
     x_values = [x0]
     y_values = [y0]
     y_prime_values = [y_prime0]
@@ -543,7 +792,7 @@ def runge_kutta_4th_order_edo_5th_order(f, x0, y0, y_prime0, y_double_prime0, y_
     y_quadruple_prime_values = [y_quadruple_prime0]
 
     # Implementação do método de Runge-Kutta de quinta ordem
-    for _ in range(num_points):
+    for _ in range(1, n+1):
         x = x_values[-1]
         y = y_values[-1]
         y_prime = y_prime_values[-1]
@@ -584,12 +833,58 @@ def runge_kutta_4th_order_edo_5th_order(f, x0, y0, y_prime0, y_double_prime0, y_
 
     return x_values, y_values, y_prime_values, y_double_prime_values, y_triple_prime_values, y_quadruple_prime_values
 
+def runge_kutta_6th_order_edo_5th_order(f, x0, y0, y_prime0, y_double_prime0, y_triple_prime0, y_quadruple_prime0, x_max, n):
+    h = (x_max - x0) / n
+    x_values = np.linspace(x0, x_max, n + 1)
+    y1_values = np.zeros(n + 1)
+    y2_values = np.zeros(n + 1)
+    y3_values = np.zeros(n + 1)
+    y4_values = np.zeros(n + 1)
+    y5_values = np.zeros(n + 1)
+
+    x = x0
+    y1 = y0
+    y2 = y_prime0  # Inicialmente, a segunda derivada é desconhecida
+    y3 = y_double_prime0  # Inicialmente, a terceira derivada é desconhecida
+    y4 = y_triple_prime0  # Inicialmente, a quarta derivada é desconhecida
+    y5 = y_quadruple_prime0  # Inicialmente, a quinta derivada é desconhecida
+
+    for i in range(1, n + 1):
+        k1_y1 = h * y2
+        k1_y2 = h * y3
+        k1_y3 = h * y4
+        k1_y4 = h * y5
+        k1_y5 = h * f(x, y1, y2, y3, y4, y5)
+
+        k2_y1 = h * (y2 + k1_y2 / 3)
+        k2_y2 = h * (y3 + k1_y3 / 3)
+        k2_y3 = h * (y4 + k1_y4 / 3)
+        k2_y4 = h * (y5 + k1_y5 / 3)
+        k2_y5 = h * f(x + h / 3, y1 + k1_y1 / 3, y2 + k1_y2 / 3, y3 + k1_y3 / 3, y4 + k1_y4 / 3, y5 + k1_y5 / 3)
+
+        # ... (continuar com os k3, k4, k5 e k6)
+
+        y1 = y1 + (k1_y1 + 3 * k3_y1 + 4 * k4_y1 + k5_y1 + 3 * k6_y1) / 15
+        y2 = y2 + (k1_y2 + 3 * k3_y2 + 4 * k4_y2 + k5_y2 + 3 * k6_y2) / 15
+        y3 = y3 + (k1_y3 + 3 * k3_y3 + 4 * k4_y3 + k5_y3 + 3 * k6_y3) / 15
+        y4 = y4 + (k1_y4 + 3 * k3_y4 + 4 * k4_y4 + k5_y4 + 3 * k6_y4) / 15
+        y5 = y5 + (k1_y5 + 3 * k3_y5 + 4 * k4_y5 + k5_y5 + 3 * k6_y5) / 15
+
+        x = x + h
+        x_values[i] = x
+        y1_values[i] = y1
+        y2_values[i] = y2
+        y3_values[i] = y3
+        y4_values[i] = y4
+        y5_values[i] = y5
+
+    return x_values, y1_values, y2_values, y3_values, y4_values, y5_values
 
 ##Parte Grafica
 
 # Criar a janela principal
 root = tk.Tk()
-root.title("Resolver EDO's de 1nd e 2nd Ordem")
+root.title("Resolver EDO's de 1nd-5nd Ordem")
 
 root.geometry("430x500")
 
@@ -663,25 +958,48 @@ p_label1.pack()
 p_entry1 = tk.Entry(frame_aux1)
 p_entry1.pack()
 
-# Botão para calcular y1
-solve_button1_1 = tk.Button(frame_aux1, text="Calcular y1", command=iniciar_1nd_ordem_i, bd=2, bg = '#107db2', fg ='white'
-                            , font = ('verdana', 8, 'bold'))
-solve_button1_1.pack(pady=(20, 0))
+g = 0
 
-# Botão para calcular y1
-solve_button1_2 = tk.Button(frame_aux1, text="Listar y1", command=iniciar_1nd_ordem_l, bd=2, bg = '#107db2', fg ='white'
+buttons_frame_1 = tk.Frame(frame_aux1)
+buttons_frame_1.pack()
+
+# Botão para calcular com rk4
+solve_button1_1 = tk.Button(buttons_frame_1, width=8, text="RK4", command=lambda: iniciar_1nd_ordem_i(4), bd=2, bg = '#107db2', fg ='white'
                             , font = ('verdana', 8, 'bold'))
-solve_button1_2.pack(pady=(10, 0))
+solve_button1_1.grid(row=0, column=0, padx=(10, 0), pady=(10, 10), sticky="nsew")  # Use grid
+
+
+# Botão para calcular com rk6
+solve_button1_2 = tk.Button(buttons_frame_1, width=8, text="RK6", command=lambda: iniciar_1nd_ordem_i(6), bd=2, bg = '#107db2', fg ='white'
+                            , font = ('verdana', 8, 'bold'))
+solve_button1_2.grid(row=0, column=1, padx=(10, 0), pady=(10, 10), sticky="nsew")  # Use grid
+
+# Botão para calcular com rk4
+solve_button1_3 = tk.Button(buttons_frame_1, width=8, text="EL1", command=lambda: iniciar_1nd_ordem_i(1), bd=2, bg = '#107db2', fg ='white'
+                            , font = ('verdana', 8, 'bold'))
+solve_button1_3.grid(row=1, column=0, padx=(10, 0), pady=(0, 10), sticky="nsew")  # Use grid
+
+
+# Botão para calcular com rk6
+solve_button1_4 = tk.Button(buttons_frame_1, width=8, text="EL2", command=lambda: iniciar_1nd_ordem_i(2), bd=2, bg = '#107db2', fg ='white'
+                            , font = ('verdana', 8, 'bold'))
+solve_button1_4.grid(row=1, column=1, padx=(10, 0), pady=(0, 10), sticky="nsew")  # Use grid
+
+
+# Botão para listar y1
+solve_button1_5 = tk.Button(frame_aux1, width=12, text="Listar y1", command=lambda: iniciar_1nd_ordem_l(g), bd=2, bg = '#107db2', fg ='white'
+                            , font = ('verdana', 8, 'bold'))
+solve_button1_5.pack(pady=(10, 0))
 
 # Botaão para plotar y/x
-plot_button_1 = tk.Button(frame_aux1, text="Plotar Gráfico", command=plot_graph_first_order, bd=2, bg='#107db2', fg='white',
+plot_button_1 = tk.Button(frame_aux1, width=12, text="Plotar Gráfico", command=plot_graph_first_order, bd=2, bg='#107db2', fg='white',
                         font=('verdana', 8, 'bold'))
 plot_button_1.pack(pady=(10, 0))
 
 
 # Rótulo para mostrar o resultado final de y1
 result_label1 = tk.Label(frame_aux1, text="")
-result_label1.pack(pady=(10, 10))
+result_label1.pack(pady=(10, 5))
 
 # Lista de valores
 result_frame1 = tk.Frame(frame_aux1)
@@ -765,18 +1083,38 @@ p_label2.pack()
 p_entry2 = tk.Entry(frame_aux2)
 p_entry2.pack()
 
-# Botão para calcular y1
-solve_button2_1 = tk.Button(frame_aux2, text="Calcular y1 e z1", command=iniciar_2nd_ordem_i, bd=2, bg = '#107db2', fg ='white'
+buttons_frame_2 = tk.Frame(frame_aux2)
+buttons_frame_2.pack()
+
+# Botão para calcular com rk4
+solve_button2_1 = tk.Button(buttons_frame_2, width=8, text="RK4", command=lambda: iniciar_2nd_ordem_i(4), bd=2, bg = '#107db2', fg ='white'
                             , font = ('verdana', 8, 'bold'))
-solve_button2_1.pack(pady=(10, 0))
+solve_button2_1.grid(row=0, column=0, padx=(10, 0), pady=(10, 10), sticky="nsew")  # Use grid
+
+
+# Botão para calcular com rk6
+solve_button2_2 = tk.Button(buttons_frame_2, width=8, text="RK6", command=lambda: iniciar_2nd_ordem_i(6), bd=2, bg = '#107db2', fg ='white'
+                            , font = ('verdana', 8, 'bold'))
+solve_button2_2.grid(row=0, column=1, padx=(10, 0), pady=(10, 10), sticky="nsew")  # Use grid
+
+# Botão para calcular com rk4
+solve_button2_3 = tk.Button(buttons_frame_2, width=8, text="EL1", command=lambda: iniciar_2nd_ordem_i(1), bd=2, bg = '#107db2', fg ='white'
+                            , font = ('verdana', 8, 'bold'))
+solve_button2_3.grid(row=1, column=0, padx=(10, 0), pady=(0, 10), sticky="nsew")  # Use grid
+
+
+# Botão para calcular com rk6
+solve_button2_4 = tk.Button(buttons_frame_2, width=8, text="EL2", command=lambda: iniciar_2nd_ordem_i(2), bd=2, bg = '#107db2', fg ='white'
+                            , font = ('verdana', 8, 'bold'))
+solve_button2_4.grid(row=1, column=1, padx=(10, 0), pady=(0, 10), sticky="nsew")  # Use grid
 
 # Botão para listar y1
-solve_button2_2 = tk.Button(frame_aux2, text="Listar y1 e z1", command=iniciar_2nd_ordem_l, bd=2, bg = '#107db2', fg ='white'
+solve_button2_5 = tk.Button(frame_aux2, width=12, text="Listar y1", command=lambda: iniciar_2nd_ordem_l(g), bd=2, bg = '#107db2', fg ='white'
                             , font = ('verdana', 8, 'bold'))
-solve_button2_2.pack(pady=(10, 0))
+solve_button2_5.pack(pady=(10, 0))
 
 # Botão para plotar grafico 
-plot_button_2 = tk.Button(frame_aux2, text="Plotar Gráfico", command=plot_graph_second_order, bd=2, bg='#107db2',
+plot_button_2 = tk.Button(frame_aux2, width=12, text="Plotar Gráfico", command=plot_graph_second_order, bd=2, bg='#107db2',
                                       fg='white', font=('verdana', 8, 'bold'))
 plot_button_2.pack(pady=(10, 0))
 
@@ -877,20 +1215,38 @@ p_label3.pack(pady=(5,0))
 p_entry3 = tk.Entry(frame_aux3)
 p_entry3.pack(pady=(5,0))
 
-# Botão para calcular y1
-solve_button3_1 = tk.Button(frame_aux3, text="Calcular y1", command=iniciar_3nd_ordem_i, bd=2, bg = '#107db2', fg ='white'
+buttons_frame_3 = tk.Frame(frame_aux3)
+buttons_frame_3.pack()
+
+# Botão para calcular com rk4
+solve_button3_1 = tk.Button(buttons_frame_3, width=8, text="RK4", command=lambda: iniciar_3nd_ordem_i(4), bd=2, bg = '#107db2', fg ='white'
                             , font = ('verdana', 8, 'bold'))
-solve_button3_1.pack(pady=(5,0))
+solve_button3_1.grid(row=0, column=0, padx=(10, 0), pady=(10, 10), sticky="nsew")  # Use grid
 
 
-#Botão para plotar y/x
+# Botão para calcular com rk6
+solve_button3_2 = tk.Button(buttons_frame_3, width=8, text="RK6", command=lambda: iniciar_3nd_ordem_i(6), bd=2, bg = '#107db2', fg ='white'
+                            , font = ('verdana', 8, 'bold'))
+solve_button3_2.grid(row=0, column=1, padx=(10, 0), pady=(10, 10), sticky="nsew")  # Use grid
+
+# Botão para calcular com rk4
+solve_button3_3 = tk.Button(buttons_frame_3, width=8, text="EL1", command=lambda: iniciar_3nd_ordem_i(1), bd=2, bg = '#107db2', fg ='white'
+                            , font = ('verdana', 8, 'bold'))
+solve_button3_3.grid(row=1, column=0, padx=(10, 0), pady=(0, 10), sticky="nsew")  # Use grid
+
+
+# Botão para calcular com rk6
+solve_button3_4 = tk.Button(buttons_frame_3, width=8, text="EL2", command=lambda: iniciar_3nd_ordem_i(2), bd=2, bg = '#107db2', fg ='white'
+                            , font = ('verdana', 8, 'bold'))
+solve_button3_4.grid(row=1, column=1, padx=(10, 0), pady=(0, 10), sticky="nsew")  # Use grid
+
+# Botão para listar y1
+solve_button3_5 = tk.Button(frame_aux3, width=12, text="Listar y1", command=lambda: iniciar_3nd_ordem_l(g), bd=2, bg = '#107db2', fg ='white'
+                            , font = ('verdana', 8, 'bold'))
+solve_button3_5.pack(pady=(10, 0))
+
 # Botão para plotar grafico 
-solve_button3_2 = tk.Button(frame_aux3, text="Listar y1, z1, w1", command=iniciar_3nd_ordem_l, bd=2, bg='#107db2',
-                                      fg='white', font=('verdana', 8, 'bold'))
-solve_button3_2.pack(pady=(10, 0))
-# Botão para plotar grafico 
-
-plot_button_3 = tk.Button(frame_aux3, text="Plotar Gráfico", command=plot_graph_third_order, bd=2, bg='#107db2',
+plot_button_3 = tk.Button(frame_aux3, width=12, text="Plotar Gráfico", command=plot_graph_third_order, bd=2, bg='#107db2',
                                       fg='white', font=('verdana', 8, 'bold'))
 plot_button_3.pack(pady=(10, 0))
 
@@ -995,23 +1351,40 @@ p_entry4 = tk.Entry(frame_aux4)
 p_entry4.pack(pady=(5,0))
 
 
-# Botão para calcular y1
-solve_button4_1 = tk.Button(frame_aux4, text="Calcular y1", command=iniciar_4nd_ordem_i, bd=2, bg = '#107db2', fg ='white'
+buttons_frame_4 = tk.Frame(frame_aux4)
+buttons_frame_4.pack()
+
+# Botão para calcular com rk4
+solve_button4_1 = tk.Button(buttons_frame_4, width=8, text="RK4", command=lambda: iniciar_4nd_ordem_i(4), bd=2, bg = '#107db2', fg ='white'
                             , font = ('verdana', 8, 'bold'))
-solve_button4_1.pack(pady=(5,0))
+solve_button4_1.grid(row=0, column=0, padx=(10, 0), pady=(10, 10), sticky="nsew")  # Use grid
 
 
-#Botão para plotar y/x
+# Botão para calcular com rk6
+solve_button4_2 = tk.Button(buttons_frame_4, width=8, text="RK6", command=lambda: iniciar_4nd_ordem_i(6), bd=2, bg = '#107db2', fg ='white'
+                            , font = ('verdana', 8, 'bold'))
+solve_button4_2.grid(row=0, column=1, padx=(10, 0), pady=(10, 10), sticky="nsew")  # Use grid
+
+# Botão para calcular com rk4
+solve_button4_3 = tk.Button(buttons_frame_4, width=8, text="EL1", command=lambda: iniciar_4nd_ordem_i(1), bd=2, bg = '#107db2', fg ='white'
+                            , font = ('verdana', 8, 'bold'))
+solve_button4_3.grid(row=1, column=0, padx=(10, 0), pady=(0, 10), sticky="nsew")  # Use grid
+
+
+# Botão para calcular com rk6
+solve_button4_4 = tk.Button(buttons_frame_4, width=8, text="EL2", command=lambda: iniciar_4nd_ordem_i(2), bd=2, bg = '#107db2', fg ='white'
+                            , font = ('verdana', 8, 'bold'))
+solve_button4_4.grid(row=1, column=1, padx=(10, 0), pady=(0, 10), sticky="nsew")  # Use grid
+
+# Botão para listar y1
+solve_button4_5 = tk.Button(frame_aux4, width=12, text="Listar y1", command=lambda: iniciar_4nd_ordem_l(g), bd=2, bg = '#107db2', fg ='white'
+                            , font = ('verdana', 8, 'bold'))
+solve_button4_5.pack(pady=(10, 0))
+
 # Botão para plotar grafico 
-solve_button4_2 = tk.Button(frame_aux4, text="Listar y1, z1, w1, j1", command=iniciar_4nd_ordem_l, bd=2, bg='#107db2',
-                                      fg='white', font=('verdana', 8, 'bold'))
-solve_button4_2.pack(pady=(10, 0))
-# Botão para plotar grafico 
-
-plot_button_4 = tk.Button(frame_aux4, text="Plotar Gráfico", command=plot_graph_fourth_order, bd=2, bg='#107db2',
+plot_button_4 = tk.Button(frame_aux4, width=12, text="Plotar Gráfico", command=plot_graph_fourth_order, bd=2, bg='#107db2',
                                       fg='white', font=('verdana', 8, 'bold'))
 plot_button_4.pack(pady=(10, 0))
-
 
 # Rótulo para mostrar o resultado final de y1
 result_label4 = tk.Label(frame_aux4, text="")
@@ -1118,23 +1491,41 @@ p_label5.pack(pady=(5,0))
 p_entry5 = tk.Entry(frame_aux5)
 p_entry5.pack(pady=(5,0))
 
+buttons_frame_5 = tk.Frame(frame_aux5)
+buttons_frame_5.pack()
 
-# Botão para calcular y1
-solve_button5_1 = tk.Button(frame_aux5, text="Calcular y1", command=iniciar_5nd_ordem_i, bd=2, bg = '#107db2', fg ='white'
+# Botão para calcular com rk5
+solve_button5_1 = tk.Button(buttons_frame_5, width=8, text="RK4", command=lambda: iniciar_5nd_ordem_i(4), bd=2, bg = '#107db2', fg ='white'
                             , font = ('verdana', 8, 'bold'))
-solve_button5_1.pack(pady=(5,0))
+solve_button5_1.grid(row=0, column=0, padx=(10, 0), pady=(10, 10), sticky="nsew")  # Use grid
 
 
-#Botão para plotar y/x
+# Botão para calcular com rk6
+solve_button5_2 = tk.Button(buttons_frame_5, width=8, text="RK6", command=lambda: iniciar_5nd_ordem_i(6), bd=2, bg = '#107db2', fg ='white'
+                            , font = ('verdana', 8, 'bold'))
+solve_button5_2.grid(row=0, column=1, padx=(10, 0), pady=(10, 10), sticky="nsew")  # Use grid
+
+# Botão para calcular com rk5
+solve_button5_3 = tk.Button(buttons_frame_5, width=8, text="EL1", command=lambda: iniciar_5nd_ordem_i(1), bd=2, bg = '#107db2', fg ='white'
+                            , font = ('verdana', 8, 'bold'))
+solve_button5_3.grid(row=1, column=0, padx=(10, 0), pady=(0, 10), sticky="nsew")  # Use grid
+
+
+# Botão para calcular com rk6
+solve_button5_4 = tk.Button(buttons_frame_5, width=8, text="EL2", command=lambda: iniciar_5nd_ordem_i(2), bd=2, bg = '#107db2', fg ='white'
+                            , font = ('verdana', 8, 'bold'))
+solve_button5_4.grid(row=1, column=1, padx=(10, 0), pady=(0, 10), sticky="nsew")  # Use grid
+
+# Botão para listar y1
+solve_button5_5 = tk.Button(frame_aux5, width=12, text="Listar y1", command=lambda: iniciar_5nd_ordem_l(g), bd=2, bg = '#107db2', fg ='white'
+                            , font = ('verdana', 8, 'bold'))
+solve_button5_5.pack(pady=(10, 0))
+
 # Botão para plotar grafico 
-solve_button5_2 = tk.Button(frame_aux5, text="Listar y1, z1, w1, j1", command=iniciar_5nd_ordem_l, bd=2, bg='#107db2',
-                                      fg='white', font=('verdana', 8, 'bold'))
-solve_button5_2.pack(pady=(10, 0))
-# Botão para plotar grafico 
-
-plot_button_5 = tk.Button(frame_aux5, text="Plotar Gráfico", command=plot_graph_fifth_order, bd=2, bg='#107db2',
+plot_button_5 = tk.Button(frame_aux5, width=12, text="Plotar Gráfico", command=plot_graph_fifth_order, bd=2, bg='#107db2',
                                       fg='white', font=('verdana', 8, 'bold'))
 plot_button_5.pack(pady=(10, 0))
+
 
 
 # Rótulo para mostrar o resultado final de y1
