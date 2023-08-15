@@ -259,6 +259,43 @@ def solve_edo2(equation_str, gb):
 
     return x_values, y_values, z_values
 
+def solve_heun2(f, x0, y0, x_max, n):
+    step = (x_max-x0)/n
+    
+    x_values = [x0]
+    y_values = [y0]
+
+    x = x0
+    y = y0
+
+    while x < x_max:
+        k1 = step * f(x, y)
+        k2 = step * f(x + step, y + k1)
+        y = y + 0.5 * (k1 + k2)
+        x = x + step
+        x_values.append(x)
+        y_values.append(y)
+
+    return x_values, y_values
+
+def solve_euler2(f, x0, y0, x_max, n):
+    step = (x_max-x0)/n
+    
+    x_values = [x0]
+    y_values = [y0]
+
+
+    x = x0
+    y = y0
+
+    while x < x_max:
+        y = y + step * f(x, y)
+        x = x + step
+        x_values.append(x)
+        y_values.append(y)
+
+    return x_values, y_values
+
 def runge_kutta_4th_order_edo_2th_order(f, x0, y0, y_prime0, x_max, n):
 
     h = (x_max - x0) / n
@@ -421,6 +458,43 @@ def solve_edo3(equation_str, gb):
         x_values, y_values, z_values, w_values = solve_heun1(f, x0, y0, x_final, n)
 
     return x_values, y_values, z_values, w_values
+
+def solve_heun3(f, x0, y0, x_max, n):
+    step = (x_max-x0)/n
+    
+    x_values = [x0]
+    y_values = [y0]
+
+    x = x0
+    y = y0
+
+    while x < x_max:
+        k1 = step * f(x, y)
+        k2 = step * f(x + step, y + k1)
+        y = y + 0.5 * (k1 + k2)
+        x = x + step
+        x_values.append(x)
+        y_values.append(y)
+
+    return x_values, y_values
+
+def solve_euler3(f, x0, y0, x_max, n):
+    step = (x_max-x0)/n
+    
+    x_values = [x0]
+    y_values = [y0]
+
+
+    x = x0
+    y = y0
+
+    while x < x_max:
+        y = y + step * f(x, y)
+        x = x + step
+        x_values.append(x)
+        y_values.append(y)
+
+    return x_values, y_values
 
 def runge_kutta_4th_order_edo_3th_order(f, x0, y0, y_prime0, y_double_prime0, x_max, n):
     h = (x_max - x0) / n
@@ -602,6 +676,43 @@ def solve_edo4(equation_str, gb):
 
     return x_values, y_values, z_values, w_values, j_values
 
+def solve_heun4(f, x0, y0, x_max, n):
+    step = (x_max-x0)/n
+    
+    x_values = [x0]
+    y_values = [y0]
+
+    x = x0
+    y = y0
+
+    while x < x_max:
+        k1 = step * f(x, y)
+        k2 = step * f(x + step, y + k1)
+        y = y + 0.5 * (k1 + k2)
+        x = x + step
+        x_values.append(x)
+        y_values.append(y)
+
+    return x_values, y_values
+
+def solve_euler4(f, x0, y0, x_max, n):
+    step = (x_max-x0)/n
+    
+    x_values = [x0]
+    y_values = [y0]
+
+
+    x = x0
+    y = y0
+
+    while x < x_max:
+        y = y + step * f(x, y)
+        x = x + step
+        x_values.append(x)
+        y_values.append(y)
+
+    return x_values, y_values
+
 def runge_kutta_4th_order_edo_4th_order(f, x0, y0, y_prime0, y_double_prime0, y_triple_prime0, x_max, n ):
     h = (x_max - x0) / n
     x_values = [x0]
@@ -780,6 +891,43 @@ def solve_edo5(equation_str, gb):
         x_values, y_values, z_values, w_values, j_value, c_valuess = solve_heun1(f, x0, y0, x_final, n)
 
     return x_values, y_values, z_values, w_values, j_values, c_values
+
+def solve_heun5(f, x0, y0, x_max, n):
+    step = (x_max-x0)/n
+    
+    x_values = [x0]
+    y_values = [y0]
+
+    x = x0
+    y = y0
+
+    while x < x_max:
+        k1 = step * f(x, y)
+        k2 = step * f(x + step, y + k1)
+        y = y + 0.5 * (k1 + k2)
+        x = x + step
+        x_values.append(x)
+        y_values.append(y)
+
+    return x_values, y_values
+
+def solve_euler5(f, x0, y0, x_max, n):
+    step = (x_max-x0)/n
+    
+    x_values = [x0]
+    y_values = [y0]
+
+
+    x = x0
+    y = y0
+
+    while x < x_max:
+        y = y + step * f(x, y)
+        x = x + step
+        x_values.append(x)
+        y_values.append(y)
+
+    return x_values, y_values
 
 def runge_kutta_4th_order_edo_5th_order(f, x0, y0, y_prime0, y_double_prime0, y_triple_prime0, y_quadruple_prime0, x_max, n):
     h = (x_max - x0) / n
