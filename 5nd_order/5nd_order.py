@@ -943,7 +943,7 @@ def iniciar_5nd_ordem_i(gb):
     result_label5.config(text=f"y1 = {y1:.6f}",  bd=2, bg = '#107db2', fg ='white'
                             , font = ('verdana', 8, 'bold'))
 
-def iniciar_5nd_ordem_l(bg):
+def iniciar_5nd_ordem_l(gb):
     
     p = int(p_entry5.get())
     
@@ -993,13 +993,17 @@ def solve_edo5(equation_str, gb):
 
     if gb == 4:
         x_values, y_values, z_values, w_values, j_values, c_values = runge_kutta_4th_order_edo_5th_order(f, x0, y0, z0, w0, j0, c0, x_final, n)
+
     elif gb == 6:
         x_values, y_values, z_values, w_values, j_values, c_values = runge_kutta_6th_order_edo_5th_order(f, x0, y0, z0, w0, j0, c0, x_final, n)
+
     elif gb == 1:
         x_values, y_values, z_values, w_values, j_values, c_values = solve_euler5(f, x0, y0, z0, w0, j0, c0, x_final, n)
-    elif gb == 2:
-        x_values, y_values, z_values, w_values, j_value, c_valuess = solve_heun5(f, x0, y0, z0, w0, j0, c0, x_final, n)
 
+    elif gb == 2:
+        x_values, y_values, z_values, w_values, j_values, c_values = solve_heun5(f, x0, y0, z0, w0, j0, c0, x_final, n)
+
+    
     return x_values, y_values, z_values, w_values, j_values, c_values
 
 def solve_euler5(f, x0, y0, z0, w0, j0, c0, x_max, n):
