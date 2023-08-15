@@ -635,7 +635,7 @@ def runge_kutta_6th_order_edo_3th_order(f, x0, y0, y_prime0, y_double_prime0, x_
 # 4 ORDEM ###########
 
 def plot_graph_fourth_order():
-    x_values, y_values, _, _, _ = solve_edo4(equation_entry4.get(), gb)
+    x_values, y_values, _, _, _ = solve_edo4(equation_entry4.get(), g)
     plt.figure(figsize=(8, 6))
     plt.plot(x_values, y_values, label="y(x)")
     plt.xlabel("x")
@@ -719,48 +719,91 @@ def solve_edo4(equation_str, gb):
     elif gb == 6:
         x_values, y_values, z_values, w_values, j_values = runge_kutta_6th_order_edo_4th_order(f, x0, y0, z0, w0, j0, x_final, n)
     elif gb == 1:
-        x_values, y_values, z_values, w_values, j_values = solve_euler1(f, x0, y0, x_final, n)
+        x_values, y_values, z_values, w_values, j_values = solve_euler4(f, x0, y0, z0, w0, j0, x_final, n)
     elif gb == 2:
-        x_values, y_values, z_values, w_values, j_values = solve_heun1(f, x0, y0, x_final, n)
+        x_values, y_values, z_values, w_values, j_values = solve_heun4(f, x0, y0, z0, w0, j0, x_final, n)
 
     return x_values, y_values, z_values, w_values, j_values
 
-def solve_heun4(f, x0, y0, x_max, n):
-    step = (x_max-x0)/n
+def solve_euler4(f, x0, y0, z0, w0, j0, x_max, n):
+    step = (x_max - x0) / n
     
     x_values = [x0]
     y_values = [y0]
+    z_values = [z0]
+    w_values = [w0]
+    j_values = [j0]
 
     x = x0
     y = y0
+    z = z0
+    w = w0
+    j = j0
 
-    while x < x_max:
-        k1 = step * f(x, y)
-        k2 = step * f(x + step, y + k1)
-        y = y + 0.5 * (k1 + k2)
+    for _ in range(n):
+        y_next = y + step * z
+        z_next = z + step * w
+        w_next = w + step * j
+        j_next = j + step * f(x, y, z, w, j)
+
         x = x + step
+        y = y_next
+        z = z_next
+        w = w_next
+        j = j_next
+
         x_values.append(x)
         y_values.append(y)
+        z_values.append(z)
+        w_values.append(w)
+        j_values.append(j)
 
-    return x_values, y_values
+    return x_values, y_values, z_values, w_values, j_values
 
-def solve_euler4(f, x0, y0, x_max, n):
-    step = (x_max-x0)/n
+def solve_heun4(f, x0, y0, z0, w0, j0, x_max, n):
+    step = (x_max - x0) / n
     
     x_values = [x0]
     y_values = [y0]
-
+    z_values = [z0]
+    w_values = [w0]
+    j_values = [j0]
 
     x = x0
     y = y0
+    z = z0
+    w = w0
+    j = j0
 
-    while x < x_max:
-        y = y + step * f(x, y)
+    for _ in range(n):
+        k1 = step * z
+        l1 = step * w
+        m1 = step * j
+        n1 = step * f(x, y, z, w, j)
+
+        k2 = step * (z + 0.5 * l1)
+        l2 = step * (w + 0.5 * m1)
+        m2 = step * (j + 0.5 * n1)
+        n2 = step * f(x + 0.5 * step, y + 0.5 * k1, z + 0.5 * l1, w + 0.5 * m1, j + 0.5 * n1)
+
+        y_next = y + k2
+        z_next = z + l2
+        w_next = w + m2
+        j_next = j + n2
+
         x = x + step
+        y = y_next
+        z = z_next
+        w = w_next
+        j = j_next
+
         x_values.append(x)
         y_values.append(y)
+        z_values.append(z)
+        w_values.append(w)
+        j_values.append(j)
 
-    return x_values, y_values
+    return x_values, y_values, z_values, w_values, j_values
 
 def runge_kutta_4th_order_edo_4th_order(f, x0, y0, y_prime0, y_double_prime0, y_triple_prime0, x_max, n ):
     h = (x_max - x0) / n
@@ -816,9 +859,9 @@ def runge_kutta_6th_order_edo_4th_order(f, x0, y0, y_prime0, y_double_prime0, y_
 
     x = x0
     y1 = y0
-    y2 = y_prime0  # Inicialmente, a segunda derivada é desconhecida
-    y3 = y_double_prime0  # Inicialmente, a terceira derivada é desconhecida
-    y4 = 0  # Inicialmente, a quarta derivada é desconhecida
+    y2 = y_prime0  
+    y3 = y_double_prime0  
+    y4 = y_triple_prime0  
 
     for i in range(1, n + 1):
         k1_y1 = h * y2
@@ -831,7 +874,25 @@ def runge_kutta_6th_order_edo_4th_order(f, x0, y0, y_prime0, y_double_prime0, y_
         k2_y3 = h * (y4 + k1_y4 / 3)
         k2_y4 = h * f(x + h / 3, y1 + k1_y1 / 3, y2 + k1_y2 / 3, y3 + k1_y3 / 3, y4 + k1_y4 / 3)
 
-        # ... (continuar com os k3, k4, k5 e k6)
+        k3_y1 = h * (y2 + k2_y2 / 3)
+        k3_y2 = h * (y3 + k2_y3 / 3)
+        k3_y3 = h * (y4 + k2_y4 / 3)
+        k3_y4 = h * f(x + 2 * h / 3, y1 + k2_y1 / 3, y2 + k2_y2 / 3, y3 + k2_y3 / 3, y4 + k2_y4 / 3)
+
+        k4_y1 = h * (y2 + k3_y2)
+        k4_y2 = h * (y3 + k3_y3)
+        k4_y3 = h * (y4 + k3_y4)
+        k4_y4 = h * f(x + h, y1 + k3_y1, y2 + k3_y2, y3 + k3_y3, y4 + k3_y4)
+
+        k5_y1 = h * (y2 + (k1_y2 + 2 * k2_y2 + 2 * k3_y2 + k4_y2) / 7)
+        k5_y2 = h * (y3 + (k1_y3 + 2 * k2_y3 + 2 * k3_y3 + k4_y3) / 7)
+        k5_y3 = h * (y4 + (k1_y4 + 2 * k2_y4 + 2 * k3_y4 + k4_y4) / 7)
+        k5_y4 = h * f(x + 5 * h / 6, y1 + (k1_y1 + 2 * k2_y1 + 2 * k3_y1 + k4_y1) / 7, y2 + (k1_y2 + 2 * k2_y2 + 2 * k3_y2 + k4_y2) / 7, y3 + (k1_y3 + 2 * k2_y3 + 2 * k3_y3 + k4_y3) / 7, y4 + (k1_y4 + 2 * k2_y4 + 2 * k3_y4 + k4_y4) / 7)
+
+        k6_y1 = h * (y2 + (7 * k1_y2 + 10 * k2_y2 + k4_y2) / 27)
+        k6_y2 = h * (y3 + (7 * k1_y3 + 10 * k2_y3 + k4_y3) / 27)
+        k6_y3 = h * (y4 + (7 * k1_y4 + 10 * k2_y4 + k4_y4) / 27)
+        k6_y4 = h * f(x + h, y1 + (7 * k1_y1 + 10 * k2_y1 + k4_y1) / 27, y2 + (7 * k1_y2 + 10 * k2_y2 + k4_y2) / 27, y3 + (7 * k1_y3 + 10 * k2_y3 + k4_y3) / 27, y4 + (7 * k1_y4 + 10 * k2_y4 + k4_y4) / 27)
 
         y1 = y1 + (k1_y1 + 3 * k3_y1 + 4 * k4_y1 + k5_y1 + 3 * k6_y1) / 15
         y2 = y2 + (k1_y2 + 3 * k3_y2 + 4 * k4_y2 + k5_y2 + 3 * k6_y2) / 15
@@ -850,7 +911,7 @@ def runge_kutta_6th_order_edo_4th_order(f, x0, y0, y_prime0, y_double_prime0, y_
 # 5 ORDEM ###########
 
 def plot_graph_fifth_order():
-    x_values, y_values, _, _, _, _ = solve_edo5(equation_entry5.get(), gb)
+    x_values, y_values, _, _, _, _ = solve_edo5(equation_entry5.get(), g)
     plt.figure(figsize=(8, 6))
     plt.plot(x_values, y_values, label="y(x)")
     plt.xlabel("x")
@@ -935,48 +996,103 @@ def solve_edo5(equation_str, gb):
     elif gb == 6:
         x_values, y_values, z_values, w_values, j_values, c_values = runge_kutta_6th_order_edo_5th_order(f, x0, y0, z0, w0, j0, c0, x_final, n)
     elif gb == 1:
-        x_values, y_values, z_values, w_values, j_values, c_values = solve_euler1(f, x0, y0, x_final, n)
+        x_values, y_values, z_values, w_values, j_values, c_values = solve_euler5(f, x0, y0, z0, w0, j0, c0, x_final, n)
     elif gb == 2:
-        x_values, y_values, z_values, w_values, j_value, c_valuess = solve_heun1(f, x0, y0, x_final, n)
+        x_values, y_values, z_values, w_values, j_value, c_valuess = solve_heun5(f, x0, y0, z0, w0, j0, c0, x_final, n)
 
     return x_values, y_values, z_values, w_values, j_values, c_values
 
-def solve_heun5(f, x0, y0, x_max, n):
-    step = (x_max-x0)/n
+def solve_euler5(f, x0, y0, z0, w0, j0, c0, x_max, n):
+    step = (x_max - x0) / n
     
     x_values = [x0]
     y_values = [y0]
+    z_values = [z0]
+    w_values = [w0]
+    j_values = [j0]
+    c_values = [c0]
 
     x = x0
     y = y0
+    z = z0
+    w = w0
+    j = j0
+    c = c0
 
-    while x < x_max:
-        k1 = step * f(x, y)
-        k2 = step * f(x + step, y + k1)
-        y = y + 0.5 * (k1 + k2)
+    for _ in range(n):
+        y_next = y + step * z
+        z_next = z + step * w
+        w_next = w + step * j
+        j_next = j + step * c
+        c_next = c + step * f(x, y, z, w, j, c)
+
         x = x + step
+        y = y_next
+        z = z_next
+        w = w_next
+        j = j_next
+        c = c_next
+
         x_values.append(x)
         y_values.append(y)
+        z_values.append(z)
+        w_values.append(w)
+        j_values.append(j)
+        c_values.append(c)
 
-    return x_values, y_values
+    return x_values, y_values, z_values, w_values, j_values, c_values
 
-def solve_euler5(f, x0, y0, x_max, n):
-    step = (x_max-x0)/n
+def solve_heun5(f, x0, y0, z0, w0, j0, c0, x_max, n):
+    step = (x_max - x0) / n
     
     x_values = [x0]
     y_values = [y0]
-
+    z_values = [z0]
+    w_values = [w0]
+    j_values = [j0]
+    c_values = [c0]
 
     x = x0
     y = y0
+    z = z0
+    w = w0
+    j = j0
+    c = c0
 
-    while x < x_max:
-        y = y + step * f(x, y)
+    for _ in range(n):
+        k1_y = step * z
+        k1_z = step * w
+        k1_w = step * j
+        k1_j = step * c
+        k1_c = step * f(x, y, z, w, j, c)
+
+        k2_y = step * (z + k1_z)
+        k2_z = step * (w + k1_w)
+        k2_w = step * (j + k1_j)
+        k2_j = step * (c + k1_c)
+        k2_c = step * f(x + step, y + k1_y, z + k1_z, w + k1_w, j + k1_j, c + k1_c)
+
+        y_next = y + 0.5 * (k1_y + k2_y)
+        z_next = z + 0.5 * (k1_z + k2_z)
+        w_next = w + 0.5 * (k1_w + k2_w)
+        j_next = j + 0.5 * (k1_j + k2_j)
+        c_next = c + 0.5 * (k1_c + k2_c)
+
         x = x + step
+        y = y_next
+        z = z_next
+        w = w_next
+        j = j_next
+        c = c_next
+
         x_values.append(x)
         y_values.append(y)
+        z_values.append(z)
+        w_values.append(w)
+        j_values.append(j)
+        c_values.append(c)
 
-    return x_values, y_values
+    return x_values, y_values, z_values, w_values, j_values, c_values
 
 def runge_kutta_4th_order_edo_5th_order(f, x0, y0, y_prime0, y_double_prime0, y_triple_prime0, y_quadruple_prime0, x_max, n):
     h = (x_max - x0) / n
@@ -1041,10 +1157,10 @@ def runge_kutta_6th_order_edo_5th_order(f, x0, y0, y_prime0, y_double_prime0, y_
 
     x = x0
     y1 = y0
-    y2 = y_prime0  # Inicialmente, a segunda derivada é desconhecida
-    y3 = y_double_prime0  # Inicialmente, a terceira derivada é desconhecida
-    y4 = y_triple_prime0  # Inicialmente, a quarta derivada é desconhecida
-    y5 = y_quadruple_prime0  # Inicialmente, a quinta derivada é desconhecida
+    y2 = y_prime0  
+    y3 = y_double_prime0  
+    y4 = y_triple_prime0  
+    y5 = y_quadruple_prime0  
 
     for i in range(1, n + 1):
         k1_y1 = h * y2
@@ -1059,7 +1175,29 @@ def runge_kutta_6th_order_edo_5th_order(f, x0, y0, y_prime0, y_double_prime0, y_
         k2_y4 = h * (y5 + k1_y5 / 3)
         k2_y5 = h * f(x + h / 3, y1 + k1_y1 / 3, y2 + k1_y2 / 3, y3 + k1_y3 / 3, y4 + k1_y4 / 3, y5 + k1_y5 / 3)
 
-        # ... (continuar com os k3, k4, k5 e k6)
+        k3_y1 = h * (y2 + k2_y2 / 3)
+        k3_y2 = h * (y3 + k2_y3 / 3)
+        k3_y3 = h * (y4 + k2_y4 / 3)
+        k3_y4 = h * (y5 + k2_y5 / 3)
+        k3_y5 = h * f(x + 2 * h / 3, y1 + k2_y1 / 3, y2 + k2_y2 / 3, y3 + k2_y3 / 3, y4 + k2_y4 / 3, y5 + k2_y5 / 3)
+
+        k4_y1 = h * (y2 + k3_y2)
+        k4_y2 = h * (y3 + k3_y3)
+        k4_y3 = h * (y4 + k3_y4)
+        k4_y4 = h * (y5 + k3_y5)
+        k4_y5 = h * f(x + h, y1 + k3_y1, y2 + k3_y2, y3 + k3_y3, y4 + k3_y4, y5 + k3_y5)
+
+        k5_y1 = h * (y2 + (k1_y2 + 2 * k2_y2 + 2 * k3_y2 + k4_y2) / 7)
+        k5_y2 = h * (y3 + (k1_y3 + 2 * k2_y3 + 2 * k3_y3 + k4_y3) / 7)
+        k5_y3 = h * (y4 + (k1_y4 + 2 * k2_y4 + 2 * k3_y4 + k4_y4) / 7)
+        k5_y4 = h * (y5 + (k1_y5 + 2 * k2_y5 + 2 * k3_y5 + k4_y5) / 7)
+        k5_y5 = h * f(x + 5 * h / 6, y1 + (k1_y1 + 2 * k2_y1 + 2 * k3_y1 + k4_y1) / 7, y2 + (k1_y2 + 2 * k2_y2 + 2 * k3_y2 + k4_y2) / 7, y3 + (k1_y3 + 2 * k2_y3 + 2 * k3_y3 + k4_y3) / 7, y4 + (k1_y4 + 2 * k2_y4 + 2 * k3_y4 + k4_y4) / 7, y5 + (k1_y5 + 2 * k2_y5 + 2 * k3_y5 + k4_y5) / 7)
+
+        k6_y1 = h * (y2 + (7 * k1_y2 + 10 * k2_y2 + k4_y2) / 27)
+        k6_y2 = h * (y3 + (7 * k1_y3 + 10 * k2_y3 + k4_y3) / 27)
+        k6_y3 = h * (y4 + (7 * k1_y4 + 10 * k2_y4 + k4_y4) / 27)
+        k6_y4 = h * (y5 + (7 * k1_y5 + 10 * k2_y5 + k4_y5) / 27)
+        k6_y5 = h * f(x + h, y1 + (7 * k1_y1 + 10 * k2_y1 + k4_y1) / 27, y2 + (7 * k1_y2 + 10 * k2_y2 + k4_y2) / 27, y3 + (7 * k1_y3 + 10 * k2_y3 + k4_y3) / 27, y4 + (7 * k1_y4 + 10 * k2_y4 + k4_y4) / 27, y5 + (7 * k1_y5 + 10 * k2_y5 + k4_y5) / 27)
 
         y1 = y1 + (k1_y1 + 3 * k3_y1 + 4 * k4_y1 + k5_y1 + 3 * k6_y1) / 15
         y2 = y2 + (k1_y2 + 3 * k3_y2 + 4 * k4_y2 + k5_y2 + 3 * k6_y2) / 15
@@ -1076,6 +1214,7 @@ def runge_kutta_6th_order_edo_5th_order(f, x0, y0, y_prime0, y_double_prime0, y_
         y5_values[i] = y5
 
     return x_values, y1_values, y2_values, y3_values, y4_values, y5_values
+
 
 ##Parte Grafica
 
