@@ -40,8 +40,7 @@ def convert_to_first_orderl(gb):
     
     result_text1.delete('1.0', tk.END)
     result_text1.insert(tk.END, text)
-
-    
+   
 def solve_runge_kutta(equation_str, gb):
     global g
     g = gb

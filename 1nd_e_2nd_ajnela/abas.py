@@ -40,7 +40,6 @@ def convert_to_first_orderl():
     
     result_text1.delete('1.0', tk.END)
     result_text1.insert(tk.END, text)
-
     
 def solve_runge_kutta(equation_str):
     # Obter os valores informados pelo usuário

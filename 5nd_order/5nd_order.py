@@ -77,7 +77,7 @@ def solve_edo1(equation_str, gb):
 
     # Resolvendo a equação usando o método de Runge-Kutta
     if gb == 4:
-        x_values, y_values = runge_kutta_4th_order_edo_1th_order(f, x0, y0, x_final, n)
+        x_values, y_values = solve_pvi_rk4th_edo_1th_order(f, x0, y0, x_final, n)
     elif gb == 6:
         x_values, y_values = runge_kutta_6th_order_edo_1th_order(f, x0, y0, x_final, n)
     elif gb == 1:
@@ -124,6 +124,14 @@ def solve_euler1(f, x0, y0, x_max, n):
 
     return x_values, y_values
 
+def solve_pvi_rk4th_edo_1th_order(f, x0, y0, x_final, n):
+    
+    # Use solve_ivp to solve the IVP
+    sol = solve_ivp(f, (x0, x_final), [y0], t_eval=np.linspace(x0, x_final, n+1), method='RK45')
+
+    return sol.t, sol.y[0]
+
+#inutilizada
 def runge_kutta_4th_order_edo_1th_order(f, x0, y0, x_max, n):
     # Implementar o método de Runge-Kutta de quarta ordem aqui
     # Retornar os valores de x e y para o intervalo de interesse
@@ -248,7 +256,7 @@ def solve_edo2(equation_str, gb):
 
     # Resolvendo a equação usando o método de Runge-Kutta
     if gb == 4:
-        x_values, y_values, z_values = runge_kutta_4th_order_edo_2th_order(f, x0, y0, z0, x_final, n)
+        x_values, y_values, z_values = solve_pvi_rk4th_edo_2th_order(f, x0, y0, z0, x_final, n)
     elif gb == 6:
         x_values, y_values, z_values = runge_kutta_6th_order_edo_2th_order(f, x0, y0, z0, x_final, n)
     elif gb == 1:
@@ -314,6 +322,14 @@ def solve_euler2(f, x0, y0, z0, x_max, n):
 
     return x_values, y_values, z_values
 
+def solve_pvi_rk4th_edo_2th_order(f, x0, y0, z0, x_max, n):
+    
+    # Use solve_ivp to solve the IVP
+    sol = solve_ivp(lambda t, u: [u[1], f(t, u[0], u[1])], (x0, x_max), [y0, z0], t_eval=np.linspace(x0, x_max, n + 1), method='RK45')
+
+    return sol.t, sol.y[0], sol.y[1]
+
+#inutilizada
 def runge_kutta_4th_order_edo_2th_order(f, x0, y0, y_prime0, x_max, n):
 
     h = (x_max - x0) / n
@@ -386,6 +402,8 @@ def runge_kutta_6th_order_edo_2th_order(f, x0, y0, y_prime0, x_max, n):
         y2_values[i] = y2
 
     return x_values, y1_values, y2_values
+
+
 
 # 3 ORDEM ############
 
@@ -467,7 +485,7 @@ def solve_edo3(equation_str, gb):
 
     # Resolvendo a equação usando o método de Runge-Kutta
     if gb == 4:
-        x_values, y_values, z_values, w_values = runge_kutta_4th_order_edo_3th_order(f, x0, y0, z0, w0, x_final, n)
+        x_values, y_values, z_values, w_values = solve_pvi_rk4th_edo_3rd_order(f, x0, y0, z0, w0, x_final, n)
     elif gb == 6:
         x_values, y_values, z_values, w_values = runge_kutta_6th_order_edo_3th_order(f, x0, y0, z0, w0, x_final, n)
     elif gb == 1:
@@ -545,6 +563,14 @@ def solve_euler3(f, x0, y0, z0, w0, x_max, n):
 
     return x_values, y_values, z_values, w_values
 
+def solve_pvi_rk4th_edo_3rd_order(f, x0, y0, z0, w0, x_max, n):
+    sol = solve_ivp(lambda t, u: [u[1], u[2], f(t, u[0], u[1], u[2])],
+                    (x0, x_max), [y0, z0, w0],
+                    t_eval=np.linspace(x0, x_max, n + 1),
+                    method='RK45')
+    return sol.t, sol.y[0], sol.y[1], sol.y[2]
+
+#inutilizada
 def runge_kutta_4th_order_edo_3th_order(f, x0, y0, y_prime0, y_double_prime0, x_max, n):
     h = (x_max - x0) / n
      # Inicializar listas para armazenar os resultados
@@ -715,7 +741,7 @@ def solve_edo4(equation_str, gb):
     # Resolvendo a equação usando o método de Runge-Kutta
     # Resolvendo a equação usando o método de Runge-Kutta
     if gb == 4:
-        x_values, y_values, z_values, w_values, j_values = runge_kutta_4th_order_edo_4th_order(f, x0, y0, z0, w0, j0, x_final, n)
+        x_values, y_values, z_values, w_values, j_values = solve_pvi_rk4th_edo_4rd_order(f, x0, y0, z0, w0, j0, x_final, n)
     elif gb == 6:
         x_values, y_values, z_values, w_values, j_values = runge_kutta_6th_order_edo_4th_order(f, x0, y0, z0, w0, j0, x_final, n)
     elif gb == 1:
@@ -805,6 +831,14 @@ def solve_heun4(f, x0, y0, z0, w0, j0, x_max, n):
 
     return x_values, y_values, z_values, w_values, j_values
 
+def solve_pvi_rk4th_edo_4rd_order(f, x0, y0, z0, w0, j0, x_max, n):
+    sol = solve_ivp(lambda t, u: [u[1], u[2], u[3], f(t, u[0], u[1], u[2], u[3])],
+                    (x0, x_max), [y0, z0, w0, j0 ],
+                    t_eval=np.linspace(x0, x_max, n + 1),
+                    method='RK45')
+    return sol.t, sol.y[0], sol.y[1], sol.y[2], sol.y[3]
+
+#inutilizada
 def runge_kutta_4th_order_edo_4th_order(f, x0, y0, y_prime0, y_double_prime0, y_triple_prime0, x_max, n ):
     h = (x_max - x0) / n
     x_values = [x0]
@@ -908,6 +942,7 @@ def runge_kutta_6th_order_edo_4th_order(f, x0, y0, y_prime0, y_double_prime0, y_
 
     return x_values, y1_values, y2_values, y3_values, y4_values
 
+
 # 5 ORDEM ###########
 
 def plot_graph_fifth_order():
@@ -992,7 +1027,7 @@ def solve_edo5(equation_str, gb):
     f = lambdify((x, y, dydx, d2ydx2, d3ydx3, d4ydx4), derivative_expr, modules=['numpy'])
 
     if gb == 4:
-        x_values, y_values, z_values, w_values, j_values, c_values = runge_kutta_4th_order_edo_5th_order(f, x0, y0, z0, w0, j0, c0, x_final, n)
+        x_values, y_values, z_values, w_values, j_values, c_values = solve_pvi_rk4th_edo_5rd_order(f, x0, y0, z0, w0, j0, c0, x_final, n)
 
     elif gb == 6:
         x_values, y_values, z_values, w_values, j_values, c_values = runge_kutta_6th_order_edo_5th_order(f, x0, y0, z0, w0, j0, c0, x_final, n)
@@ -1098,6 +1133,14 @@ def solve_heun5(f, x0, y0, z0, w0, j0, c0, x_max, n):
 
     return x_values, y_values, z_values, w_values, j_values, c_values
 
+def solve_pvi_rk4th_edo_5rd_order(f, x0, y0, z0, w0, j0, c0, x_max, n):
+    sol = solve_ivp(lambda t, u: [u[1], u[2], u[3], u[4], f(t, u[0], u[1], u[2], u[3], u[4])],
+                    (x0, x_max), [y0, z0, w0, j0, c0],
+                    t_eval=np.linspace(x0, x_max, n + 1),
+                    method='RK45')
+    return sol.t, sol.y[0], sol.y[1], sol.y[2], sol.y[3], sol.y[4]
+
+#inutilizada
 def runge_kutta_4th_order_edo_5th_order(f, x0, y0, y_prime0, y_double_prime0, y_triple_prime0, y_quadruple_prime0, x_max, n):
     h = (x_max - x0) / n
     
