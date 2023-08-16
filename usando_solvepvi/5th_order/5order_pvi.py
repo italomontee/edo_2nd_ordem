@@ -202,7 +202,6 @@ def solve_pvi_rk4th_edo_5rd_order(f, x0, y0, z0, w0, j0, c0, x_max, n):
                     method='RK45')
     return sol.t, sol.y[0], sol.y[1], sol.y[2], sol.y[3], sol.y[4]
 
-
 def runge_kutta_4th_order_edo_5th_order(f, x0, y0, y_prime0, y_double_prime0, y_triple_prime0, y_quadruple_prime0, x_max, n):
     h = (x_max - x0) / n
     
