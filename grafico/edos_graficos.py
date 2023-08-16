@@ -4,6 +4,9 @@ from sympy import *
 import tkinter as tk
 from tkinter import ttk
 import matplotlib.pyplot as plt
+from matplotlib import use 
+
+use('Agg')
 
 def plot_graph_first_order():
     x_values, y_values = solve_runge_kutta(derivative_entry1.get())
@@ -272,7 +275,7 @@ solve_button2 = tk.Button(tab1, text="Listar y1", command=convert_to_first_order
 solve_button2.pack(pady=(10, 0))
 
 # Botaão para plotar y/x
-plot_button = tk.Button(tab1, text="Plotar Gráfico", command=plot_graph, bd=2, bg='#107db2', fg='white',
+plot_button = tk.Button(tab1, text="Plotar Gráfico", command=plot_graph_first_order, bd=2, bg='#107db2', fg='white',
                         font=('verdana', 8, 'bold'))
 plot_button.pack(pady=(10, 0))
 

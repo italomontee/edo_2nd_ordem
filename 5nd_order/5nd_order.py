@@ -3,7 +3,10 @@ from scipy.integrate import solve_ivp
 from sympy import *
 import tkinter as tk
 from tkinter import ttk
-import matplotlib.pyplot as plt
+
+from matplotlib import pyplot as plt
+from matplotlib import use
+use('TkAgg')
 
 # 1 ORDEM ############
 
